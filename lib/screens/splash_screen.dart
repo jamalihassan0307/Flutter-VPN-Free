@@ -15,7 +15,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
-  void initState() {cc
+  void initState() {
     super.initState();
     Future.delayed(const Duration(milliseconds: 1500), () {
       //exit full-screen

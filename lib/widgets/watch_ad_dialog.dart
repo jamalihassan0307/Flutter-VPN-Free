@@ -10,13 +10,13 @@ class WatchAdDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoAlertDialog(
-      title: Text('Change Theme'),
-      content: Text('Watch an Ad to Change App Theme.'),
+      title: const Text('Change Theme'),
+      content: const Text('Watch an Ad to Change App Theme.'),
       actions: [
         CupertinoDialogAction(
             isDefaultAction: true,
-            textStyle: TextStyle(color: Colors.green),
-            child: Text('Watch Ad'),
+            textStyle: const TextStyle(color: Colors.green),
+            child: const Text('OK'),
             onPressed: () {
               Get.back();
               onComplete();
