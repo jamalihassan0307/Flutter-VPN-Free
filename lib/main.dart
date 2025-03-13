@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 import 'helpers/ad_helper.dart';
 import 'helpers/config.dart';
@@ -18,7 +19,9 @@ Future<void> main() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
   //firebase initialization
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   //initializing remote config
   await Config.initConfig();
@@ -28,8 +31,7 @@ Future<void> main() async {
   await AdHelper.initAds();
 
   //for setting orientation to portrait only
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((v) {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((v) {
     runApp(const MyApp());
   });
 }
@@ -44,15 +46,13 @@ class MyApp extends StatelessWidget {
       home: const SplashScreen(),
 
       //theme
-      theme: ThemeData(
-          appBarTheme: const AppBarTheme(centerTitle: true, elevation: 3)),
+      theme: ThemeData(appBarTheme: const AppBarTheme(centerTitle: true, elevation: 3)),
 
       themeMode: Pref.isDarkMode ? ThemeMode.dark : ThemeMode.light,
 
       //dark theme
-      darkTheme: ThemeData(
-          brightness: Brightness.dark,
-          appBarTheme: const AppBarTheme(centerTitle: true, elevation: 3)),
+      darkTheme:
+          ThemeData(brightness: Brightness.dark, appBarTheme: const AppBarTheme(centerTitle: true, elevation: 3)),
 
       debugShowCheckedModeBanner: false,
     );
