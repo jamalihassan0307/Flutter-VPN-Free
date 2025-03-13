@@ -12,6 +12,15 @@ class MainActivity: FlutterActivity() {
     private val TAG = "VPNEngine"
     private val REQUEST_VPN_PERMISSION = 1
 
+    companion object {
+        private var vpnService: OpenVpnService? = null
+        private var methodChannel: MethodChannel? = null
+
+        fun updateVpnStatus(status: String) {
+            methodChannel?.invokeMethod("updateStatus", status)
+        }
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         
@@ -25,6 +34,9 @@ class MainActivity: FlutterActivity() {
                             throw Exception("VPN configuration is null")
                         }
 
+                        // Store method channel for status updates
+                        methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
+
                         // Check VPN permission
                         val vpnIntent = VpnService.prepare(context)
                         if (vpnIntent != null) {
@@ -36,7 +48,8 @@ class MainActivity: FlutterActivity() {
 
                         // Start VPN service
                         Log.d(TAG, "Starting VPN service")
-                        // Add your VPN service start logic here
+                        vpnService = OpenVpnService()
+                        vpnService?.startVpn(config)
                         result.success(null)
                         
                     } catch (e: Exception) {
