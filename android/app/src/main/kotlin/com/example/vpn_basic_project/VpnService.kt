@@ -8,6 +8,8 @@ import android.content.pm.ServiceInfo
 import android.net.VpnService
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 
@@ -68,7 +70,9 @@ class OpenVpnService : VpnService() {
     fun startVpn(config: String) {
         try {
             Log.d(TAG, "Starting VPN connection with config: ${config.take(20)}...")
-            MainActivity.updateVpnStatus("CONNECTING")
+            Handler(Looper.getMainLooper()).post {
+                MainActivity.updateVpnStatus("CONNECTING")
+            }
             
             // Create VPN interface
             val builder = Builder()
@@ -85,7 +89,9 @@ class OpenVpnService : VpnService() {
             
             if (vpnInterface != null) {
                 Log.d(TAG, "VPN interface established")
-                MainActivity.updateVpnStatus("CONNECTED")
+                Handler(Looper.getMainLooper()).post {
+                    MainActivity.updateVpnStatus("CONNECTED")
+                }
                 
                 // Keep service alive
                 while (isRunning && vpnInterface != null) {
@@ -93,12 +99,16 @@ class OpenVpnService : VpnService() {
                 }
             } else {
                 Log.e(TAG, "Failed to establish VPN interface")
-                MainActivity.updateVpnStatus("FAILED")
+                Handler(Looper.getMainLooper()).post {
+                    MainActivity.updateVpnStatus("FAILED")
+                }
             }
 
         } catch (e: Exception) {
             Log.e(TAG, "Error starting VPN: ${e.message}")
-            MainActivity.updateVpnStatus("FAILED")
+            Handler(Looper.getMainLooper()).post {
+                MainActivity.updateVpnStatus("FAILED")
+            }
         } finally {
             isRunning = false
         }

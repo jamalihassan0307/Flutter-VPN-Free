@@ -6,6 +6,8 @@ import io.flutter.plugin.common.MethodChannel
 import android.net.VpnService
 import android.content.Intent
 import android.util.Log
+import android.os.Handler
+import android.os.Looper
 
 class MainActivity: FlutterActivity() {
     private val CHANNEL = "vpn_engine"
@@ -16,7 +18,9 @@ class MainActivity: FlutterActivity() {
         private var methodChannel: MethodChannel? = null
 
         fun updateVpnStatus(status: String) {
-            methodChannel?.invokeMethod("updateStatus", status)
+            Handler(Looper.getMainLooper()).post {
+                methodChannel?.invokeMethod("updateStatus", status)
+            }
         }
     }
 
