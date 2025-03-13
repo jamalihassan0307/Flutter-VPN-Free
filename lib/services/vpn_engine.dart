@@ -1,67 +1,58 @@
-import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/services.dart';
+// import 'package:flutter_openvpn/flutter_openvpn.dart';
 import '../models/vpn_status.dart';
-import '../models/vpn_config.dart';
 
 class VpnEngine {
-  ///Channel to native
-  static final String _eventChannelVpnStage = "vpnStage";
-  static final String _eventChannelVpnStatus = "vpnStatus";
-  static final String _methodChannelVpnControl = "vpnControl";
+  static const _platform = MethodChannel('vpn_engine');
+  static final _statusController = StreamController<String>.broadcast();
+  static bool _prepared = false;
 
   ///Snapshot of VPN Connection Stage
-  static Stream<String> vpnStageSnapshot() =>
-      EventChannel(_eventChannelVpnStage).receiveBroadcastStream().cast();
+  static Stream<String> vpnStageSnapshot() => _statusController.stream;
 
   ///Snapshot of VPN Connection Status
-  static Stream<VpnStatus?> vpnStatusSnapshot() =>
-      EventChannel(_eventChannelVpnStatus)
-          .receiveBroadcastStream()
-          .map((event) => VpnStatus.fromJson(jsonDecode(event)))
-          .cast();
+  static Stream<VpnStatus?> vpnStatusSnapshot() {
+    return _statusController.stream.map((event) => VpnStatus(byteIn: event, byteOut: event));
+  }
 
   ///Start VPN easily
-  static Future<void> startVpn(VpnConfig vpnConfig) async {
-    // log(vpnConfig.config);
-    return MethodChannel(_methodChannelVpnControl).invokeMethod(
-      "start",
-      {
-        "config": vpnConfig.config,
-        "country": vpnConfig.country,
-        "username": vpnConfig.username,
-        "password": vpnConfig.password,
-      },
-    );
+  static Future<void> startVpn(String config) async {
+    await _platform.invokeMethod('startVpn', {'config': config});
   }
 
   ///Stop vpn
-  static Future<void> stopVpn() =>
-      MethodChannel(_methodChannelVpnControl).invokeMethod("stop");
+  static Future<void> stopVpn() async {
+    await _platform.invokeMethod('stopVpn');
+  }
 
   ///Open VPN Settings
-  static Future<void> openKillSwitch() =>
-      MethodChannel(_methodChannelVpnControl).invokeMethod("kill_switch");
+  static Future<void> openKillSwitch() => _platform.invokeMethod("kill_switch");
 
   ///Trigger native to get stage connection
-  static Future<void> refreshStage() =>
-      MethodChannel(_methodChannelVpnControl).invokeMethod("refresh");
+  static Future<void> refreshStage() => _platform.invokeMethod("refresh");
 
   ///Get latest stage
-  static Future<String?> stage() =>
-      MethodChannel(_methodChannelVpnControl).invokeMethod("stage");
+  static Future<String?> stage() => _platform.invokeMethod("stage");
 
   ///Check if vpn is connected
-  static Future<bool> isConnected() =>
-      stage().then((value) => value?.toLowerCase() == "connected");
+  static Future<bool> isConnected() => stage().then((value) => value?.toLowerCase() == "connected");
 
   ///All Stages of connection
-  static const String vpnConnected = "connected";
-  static const String vpnDisconnected = "disconnected";
-  static const String vpnWaitConnection = "wait_connection";
-  static const String vpnAuthenticating = "authenticating";
-  static const String vpnReconnect = "reconnect";
-  static const String vpnNoConnection = "no_connection";
-  static const String vpnConnecting = "connecting";
-  static const String vpnPrepare = "prepare";
-  static const String vpnDenied = "denied";
+  static const String vpnConnected = "CONNECTED";
+  static const String vpnDisconnected = "DISCONNECTED";
+  static const String vpnWaitConnection = "WAIT";
+  static const String vpnAuthenticating = "AUTH";
+  static const String vpnReconnect = "RECONNECT";
+  static const String vpnNoConnection = "NO_CONNECTION";
+  static const String vpnConnecting = "CONNECTING";
+  static const String vpnPreparing = "PREPARING";
+  static const String vpnDenied = "DENIED";
+
+  static Future<void> initialize() async {
+    if (!_prepared) {
+      await _platform.invokeMethod('initialize');
+      _prepared = true;
+    }
+  }
 }
