@@ -1,12 +1,33 @@
 package com.example.vpn_basic_project
 
 import io.flutter.embedding.android.FlutterActivity
-import id.laskarmedia.openvpn_flutter.OpenVPNFlutterPlugin
-import android.content.Intent
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodChannel
 
 class MainActivity: FlutterActivity() {
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        OpenVPNFlutterPlugin.connectWhileGranted(requestCode == 24 && resultCode == RESULT_OK)
-        super.onActivityResult(requestCode, resultCode, data)
+    private val CHANNEL = "vpn_engine"
+
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
+        
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "startVpn" -> {
+                    // Implement VPN start logic
+                    result.success(null)
+                }
+                "stopVpn" -> {
+                    // Implement VPN stop logic
+                    result.success(null)
+                }
+                "prepare" -> {
+                    // Implement VPN preparation
+                    result.success(null)
+                }
+                else -> {
+                    result.notImplemented()
+                }
+            }
+        }
     }
 } 
