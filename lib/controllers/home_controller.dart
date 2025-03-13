@@ -11,29 +11,21 @@ import '../models/vpn_config.dart';
 import '../services/vpn_engine.dart';
 
 class HomeController extends GetxController {
-  final Rx<Vpn> vpn = Pref.vpn.obs;
-
+  final vpn = VPN().obs;
   final vpnState = VpnEngine.vpnDisconnected.obs;
 
   void connectToVpn() async {
-    if (vpn.value.openVPNConfigDataBase64.isEmpty) {
-      MyDialogs.info(msg: 'Select a Location by clicking \'Change Location\'');
+    if (vpn.value.config.isEmpty) {
+      Get.snackbar('Selection Required', 'Please select a VPN configuration first!');
       return;
     }
 
     if (vpnState.value == VpnEngine.vpnDisconnected) {
-      // log('\nBefore: ${vpn.value.openVPNConfigDataBase64}');
-
-      final data = Base64Decoder().convert(vpn.value.openVPNConfigDataBase64);
-      final config = Utf8Decoder().convert(data);
-      final vpnConfig = VpnConfig(country: vpn.value.countryLong, username: 'vpn', password: 'vpn', config: config);
-
-      // log('\nAfter: $config');
-
-      //code to show interstitial ad and then connect to vpn
-      // AdHelper.showInterstitialAd(onComplete: () async {
-      await VpnEngine.startVpn(vpnConfig);
-      // });
+      try {
+        await VpnEngine.startVpn(vpn.value.config);
+      } catch (e) {
+        Get.snackbar('Connection Failed', 'Error: ${e.toString()}');
+      }
     } else {
       await VpnEngine.stopVpn();
     }
@@ -55,15 +47,8 @@ class HomeController extends GetxController {
 
   // vpn button text
   String get getButtonText {
-    switch (vpnState.value) {
-      case VpnEngine.vpnDisconnected:
-        return 'Tap to Connect';
-
-      case VpnEngine.vpnConnected:
-        return 'Disconnect';
-
-      default:
-        return 'Connecting...';
-    }
+    if (vpnState.value == VpnEngine.vpnDisconnected) return 'Connect VPN';
+    if (vpnState.value == VpnEngine.vpnConnected) return 'Disconnect VPN';
+    return 'Connecting...';
   }
 }

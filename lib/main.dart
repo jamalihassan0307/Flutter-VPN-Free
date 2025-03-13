@@ -3,11 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'services/vpn_engine.dart';
+import 'screens/splash_screen.dart';
 
 // import 'helpers/ad_helper.dart';
 import 'helpers/config.dart';
 import 'helpers/pref.dart';
-import 'screens/splash_screen.dart';
 
 //global object for accessing dev ice screen size
 late Size mq;
@@ -27,6 +28,9 @@ Future<void> main() async {
   await Config.initConfig();
 
   await Pref.initializeHive();
+
+  // Initialize VPN
+  await VpnEngine.initializeVpn();
 
   // await AdHelper.initAds();
 
