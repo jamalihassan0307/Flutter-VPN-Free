@@ -1,25 +1,54 @@
 package com.example.vpn_basic_project
 
-import android.app.Service
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
 import android.net.VpnService
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.util.Log
+import androidx.core.app.NotificationCompat
 
 class OpenVpnService : VpnService() {
     private val TAG = "OpenVpnService"
     private var vpnInterface: ParcelFileDescriptor? = null
     private var configString: String? = null
+    private var isRunning = false
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "VPN Service Created")
+        startForeground()
+    }
+
+    private fun startForeground() {
+        val channelId = "vpn_service_channel"
+        val channelName = "VPN Service"
+        
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_LOW
+            )
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setContentTitle("VPN Service")
+            .setContentText("VPN is running")
+            .setSmallIcon(R.drawable.notification_icon)
+            .build()
+
+        startForeground(1, notification)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         configString = intent?.getStringExtra("config")
-        if (configString != null) {
+        if (configString != null && !isRunning) {
+            isRunning = true
             Thread {
                 startVpn(configString!!)
             }.start()
@@ -45,7 +74,7 @@ class OpenVpnService : VpnService() {
                 .setMtu(1500)
                 .allowFamily(android.system.OsConstants.AF_INET)
                 .allowFamily(android.system.OsConstants.AF_INET6)
-                .allowBypass() // Allow apps to bypass VPN
+                .allowBypass()
 
             vpnInterface = builder.establish()
             
@@ -53,18 +82,10 @@ class OpenVpnService : VpnService() {
                 Log.d(TAG, "VPN interface established")
                 MainActivity.updateVpnStatus("CONNECTED")
                 
-                // Start a background thread to monitor connection
-                Thread {
-                    try {
-                        // Keep the service alive
-                        while (vpnInterface != null) {
-                            Thread.sleep(1000)
-                        }
-                    } catch (e: InterruptedException) {
-                        Log.e(TAG, "VPN monitoring interrupted", e)
-                    }
-                }.start()
-                
+                // Keep service alive
+                while (isRunning && vpnInterface != null) {
+                    Thread.sleep(1000)
+                }
             } else {
                 Log.e(TAG, "Failed to establish VPN interface")
                 MainActivity.updateVpnStatus("FAILED")
@@ -73,15 +94,18 @@ class OpenVpnService : VpnService() {
         } catch (e: Exception) {
             Log.e(TAG, "Error starting VPN: ${e.message}")
             MainActivity.updateVpnStatus("FAILED")
+        } finally {
+            isRunning = false
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        isRunning = false
         stopVpn()
     }
 
-    fun stopVpn() {
+    private fun stopVpn() {
         try {
             vpnInterface?.close()
             vpnInterface = null

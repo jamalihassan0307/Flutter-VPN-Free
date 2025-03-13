@@ -13,7 +13,6 @@ class MainActivity: FlutterActivity() {
     private val REQUEST_VPN_PERMISSION = 1
 
     companion object {
-        private var vpnService: OpenVpnService? = null
         private var methodChannel: MethodChannel? = null
 
         fun updateVpnStatus(status: String) {
@@ -24,7 +23,8 @@ class MainActivity: FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
+        methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
+        methodChannel?.setMethodCallHandler { call, result ->
             when (call.method) {
                 "startVpn" -> {
                     try {
@@ -33,9 +33,6 @@ class MainActivity: FlutterActivity() {
                         if (config == null) {
                             throw Exception("VPN configuration is null")
                         }
-
-                        // Store method channel for status updates
-                        methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
 
                         // Check VPN permission
                         val vpnIntent = VpnService.prepare(context)
@@ -50,12 +47,7 @@ class MainActivity: FlutterActivity() {
                         Log.d(TAG, "Starting VPN service")
                         val serviceIntent = Intent(this, OpenVpnService::class.java)
                         serviceIntent.putExtra("config", config)
-                        startService(serviceIntent)
-                        
-                        // Get service instance
-                        vpnService = OpenVpnService()
-                        vpnService?.startVpn(config)
-                        
+                        startForegroundService(serviceIntent)
                         result.success(null)
                         
                     } catch (e: Exception) {
@@ -66,7 +58,8 @@ class MainActivity: FlutterActivity() {
                 "stopVpn" -> {
                     try {
                         Log.d(TAG, "Stopping VPN")
-                        // Add your VPN stop logic here
+                        val serviceIntent = Intent(this, OpenVpnService::class.java)
+                        stopService(serviceIntent)
                         result.success(null)
                     } catch (e: Exception) {
                         Log.e(TAG, "Error stopping VPN: ${e.message}")
