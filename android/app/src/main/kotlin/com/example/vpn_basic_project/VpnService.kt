@@ -10,6 +10,7 @@ import android.util.Log
 class OpenVpnService : VpnService() {
     private val TAG = "OpenVpnService"
     private var vpnInterface: ParcelFileDescriptor? = null
+    private var configString: String? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -17,6 +18,12 @@ class OpenVpnService : VpnService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        configString = intent?.getStringExtra("config")
+        if (configString != null) {
+            Thread {
+                startVpn(configString!!)
+            }.start()
+        }
         return START_STICKY
     }
 
@@ -27,6 +34,7 @@ class OpenVpnService : VpnService() {
     fun startVpn(config: String) {
         try {
             Log.d(TAG, "Starting VPN connection with config: ${config.take(20)}...")
+            MainActivity.updateVpnStatus("CONNECTING")
             
             // Create VPN interface
             val builder = Builder()
@@ -37,12 +45,26 @@ class OpenVpnService : VpnService() {
                 .setMtu(1500)
                 .allowFamily(android.system.OsConstants.AF_INET)
                 .allowFamily(android.system.OsConstants.AF_INET6)
+                .allowBypass() // Allow apps to bypass VPN
 
             vpnInterface = builder.establish()
             
             if (vpnInterface != null) {
                 Log.d(TAG, "VPN interface established")
                 MainActivity.updateVpnStatus("CONNECTED")
+                
+                // Start a background thread to monitor connection
+                Thread {
+                    try {
+                        // Keep the service alive
+                        while (vpnInterface != null) {
+                            Thread.sleep(1000)
+                        }
+                    } catch (e: InterruptedException) {
+                        Log.e(TAG, "VPN monitoring interrupted", e)
+                    }
+                }.start()
+                
             } else {
                 Log.e(TAG, "Failed to establish VPN interface")
                 MainActivity.updateVpnStatus("FAILED")
@@ -54,6 +76,11 @@ class OpenVpnService : VpnService() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        stopVpn()
+    }
+
     fun stopVpn() {
         try {
             vpnInterface?.close()
@@ -63,10 +90,5 @@ class OpenVpnService : VpnService() {
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping VPN: ${e.message}")
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        stopVpn()
     }
 } 

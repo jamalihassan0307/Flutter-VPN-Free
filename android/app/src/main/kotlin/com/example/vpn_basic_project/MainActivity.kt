@@ -48,8 +48,14 @@ class MainActivity: FlutterActivity() {
 
                         // Start VPN service
                         Log.d(TAG, "Starting VPN service")
+                        val serviceIntent = Intent(this, OpenVpnService::class.java)
+                        serviceIntent.putExtra("config", config)
+                        startService(serviceIntent)
+                        
+                        // Get service instance
                         vpnService = OpenVpnService()
                         vpnService?.startVpn(config)
+                        
                         result.success(null)
                         
                     } catch (e: Exception) {
