@@ -15,6 +15,32 @@ class _CountDownTimerState extends State<CountDownTimer> {
   Duration _duration = Duration();
   Timer? _timer;
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.startTimer) {
+      _startTimer();
+    }
+  }
+
+  @override
+  void didUpdateWidget(CountDownTimer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.startTimer != oldWidget.startTimer) {
+      if (widget.startTimer) {
+        _startTimer();
+      } else {
+        _stopTimer();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
@@ -33,13 +59,11 @@ class _CountDownTimerState extends State<CountDownTimer> {
 
   @override
   Widget build(BuildContext context) {
-    if (_timer == null || !widget.startTimer) widget.startTimer ? _startTimer() : _stopTimer();
-
     String twoDigit(int n) => n.toString().padLeft(2, '0');
     final minutes = twoDigit(_duration.inMinutes.remainder(60));
     final seconds = twoDigit(_duration.inSeconds.remainder(60));
     final hours = twoDigit(_duration.inHours.remainder(60));
 
-    return Text('$hours: $minutes: $seconds', style: TextStyle(fontSize: 22));
+    return Text('$hours:$minutes:$seconds', style: TextStyle(fontSize: 22));
   }
 }
