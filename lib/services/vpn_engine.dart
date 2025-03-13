@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-// import 'package:flutter_openvpn/flutter_openvpn.dart';
 import '../models/vpn_status.dart';
 
 class VpnEngine {
@@ -51,7 +50,7 @@ class VpnEngine {
 
   static Future<void> initialize() async {
     if (!_prepared) {
-      await _platform.invokeMethod('initialize');
+      await _platform.invokeMethod('prepare');
       _prepared = true;
     }
   }
