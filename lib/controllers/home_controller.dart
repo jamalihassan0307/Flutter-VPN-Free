@@ -26,18 +26,14 @@ class HomeController extends GetxController {
 
       final data = Base64Decoder().convert(vpn.value.openVPNConfigDataBase64);
       final config = Utf8Decoder().convert(data);
-      final vpnConfig = VpnConfig(
-          country: vpn.value.countryLong,
-          username: 'vpn',
-          password: 'vpn',
-          config: config);
+      final vpnConfig = VpnConfig(country: vpn.value.countryLong, username: 'vpn', password: 'vpn', config: config);
 
       // log('\nAfter: $config');
 
       //code to show interstitial ad and then connect to vpn
-      AdHelper.showInterstitialAd(onComplete: () async {
-        await VpnEngine.startVpn(vpnConfig);
-      });
+      // AdHelper.showInterstitialAd(onComplete: () async {
+      await VpnEngine.startVpn(vpnConfig);
+      // });
     } else {
       await VpnEngine.stopVpn();
     }

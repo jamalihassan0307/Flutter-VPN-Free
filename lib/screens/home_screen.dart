@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/home_controller.dart';
-import '../helpers/ad_helper.dart';
+// import '../helpers/ad_helper.dart';
 import '../helpers/config.dart';
 import '../helpers/pref.dart';
 import '../main.dart';
@@ -40,19 +40,18 @@ class HomeScreen extends StatelessWidget {
                 //ad dialog
 
                 if (Config.hideAds) {
-                  Get.changeThemeMode(
-                      Pref.isDarkMode ? ThemeMode.light : ThemeMode.dark);
+                  Get.changeThemeMode(Pref.isDarkMode ? ThemeMode.light : ThemeMode.dark);
                   Pref.isDarkMode = !Pref.isDarkMode;
                   return;
                 }
 
                 Get.dialog(WatchAdDialog(onComplete: () {
                   //watch ad to gain reward
-                  AdHelper.showRewardedAd(onComplete: () {
-                    Get.changeThemeMode(
-                        Pref.isDarkMode ? ThemeMode.light : ThemeMode.dark);
-                    Pref.isDarkMode = !Pref.isDarkMode;
-                  });
+                  // AdHelper.showRewardedAd(onComplete: () {
+                  //   Get.changeThemeMode(
+                  //       Pref.isDarkMode ? ThemeMode.light : ThemeMode.dark);
+                  //   Pref.isDarkMode = !Pref.isDarkMode;
+                  // });
                 }));
               },
               icon: Icon(
@@ -82,34 +81,27 @@ class HomeScreen extends StatelessWidget {
             children: [
               //country flag
               HomeCard(
-                  title: _controller.vpn.value.countryLong.isEmpty
-                      ? 'Country'
-                      : _controller.vpn.value.countryLong,
+                  title: _controller.vpn.value.countryLong.isEmpty ? 'Country' : _controller.vpn.value.countryLong,
                   subtitle: 'FREE',
                   icon: CircleAvatar(
                     radius: 30,
                     backgroundColor: Colors.blue,
                     child: _controller.vpn.value.countryLong.isEmpty
-                        ? Icon(Icons.vpn_lock_rounded,
-                            size: 30, color: Colors.white)
+                        ? Icon(Icons.vpn_lock_rounded, size: 30, color: Colors.white)
                         : null,
                     backgroundImage: _controller.vpn.value.countryLong.isEmpty
                         ? null
-                        : AssetImage(
-                            'assets/flags/${_controller.vpn.value.countryShort.toLowerCase()}.png'),
+                        : AssetImage('assets/flags/${_controller.vpn.value.countryShort.toLowerCase()}.png'),
                   )),
 
               //ping time
               HomeCard(
-                  title: _controller.vpn.value.countryLong.isEmpty
-                      ? '100 ms'
-                      : '${_controller.vpn.value.ping} ms',
+                  title: _controller.vpn.value.countryLong.isEmpty ? '100 ms' : '${_controller.vpn.value.ping} ms',
                   subtitle: 'PING',
                   icon: CircleAvatar(
                     radius: 30,
                     backgroundColor: Colors.orange,
-                    child: Icon(Icons.equalizer_rounded,
-                        size: 30, color: Colors.white),
+                    child: Icon(Icons.equalizer_rounded, size: 30, color: Colors.white),
                   )),
             ],
           ),
@@ -128,8 +120,7 @@ class HomeScreen extends StatelessWidget {
                         icon: CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.lightGreen,
-                          child: Icon(Icons.arrow_downward_rounded,
-                              size: 30, color: Colors.white),
+                          child: Icon(Icons.arrow_downward_rounded, size: 30, color: Colors.white),
                         )),
 
                     //upload
@@ -139,8 +130,7 @@ class HomeScreen extends StatelessWidget {
                         icon: CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.blue,
-                          child: Icon(Icons.arrow_upward_rounded,
-                              size: 30, color: Colors.white),
+                          child: Icon(Icons.arrow_upward_rounded, size: 30, color: Colors.white),
                         )),
                   ],
                 ))
@@ -161,20 +151,14 @@ class HomeScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(100),
               child: Container(
                 padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _controller.getButtonColor.withOpacity(.1)),
+                decoration: BoxDecoration(shape: BoxShape.circle, color: _controller.getButtonColor.withOpacity(.1)),
                 child: Container(
                   padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _controller.getButtonColor.withOpacity(.3)),
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: _controller.getButtonColor.withOpacity(.3)),
                   child: Container(
                     width: mq.height * .14,
                     height: mq.height * .14,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _controller.getButtonColor),
+                    decoration: BoxDecoration(shape: BoxShape.circle, color: _controller.getButtonColor),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -190,10 +174,7 @@ class HomeScreen extends StatelessWidget {
                         //text
                         Text(
                           _controller.getButtonText,
-                          style: TextStyle(
-                              fontSize: 12.5,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500),
+                          style: TextStyle(fontSize: 12.5, color: Colors.white, fontWeight: FontWeight.w500),
                         )
                       ],
                     ),
@@ -205,11 +186,9 @@ class HomeScreen extends StatelessWidget {
 
           //connection status label
           Container(
-            margin:
-                EdgeInsets.only(top: mq.height * .015, bottom: mq.height * .02),
+            margin: EdgeInsets.only(top: mq.height * .015, bottom: mq.height * .02),
             padding: EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-            decoration: BoxDecoration(
-                color: Colors.blue, borderRadius: BorderRadius.circular(15)),
+            decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(15)),
             child: Text(
               _controller.vpnState.value == VpnEngine.vpnDisconnected
                   ? 'Not Connected'
@@ -219,9 +198,7 @@ class HomeScreen extends StatelessWidget {
           ),
 
           //count down timer
-          Obx(() => CountDownTimer(
-              startTimer:
-                  _controller.vpnState.value == VpnEngine.vpnConnected)),
+          Obx(() => CountDownTimer(startTimer: _controller.vpnState.value == VpnEngine.vpnConnected)),
         ],
       );
 
@@ -246,10 +223,7 @@ class HomeScreen extends StatelessWidget {
                   //text
                   Text(
                     'Change Location',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500),
+                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
                   ),
 
                   //for covering available spacing
@@ -258,8 +232,7 @@ class HomeScreen extends StatelessWidget {
                   //icon
                   CircleAvatar(
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.keyboard_arrow_right_rounded,
-                        color: Colors.blue, size: 26),
+                    child: Icon(Icons.keyboard_arrow_right_rounded, color: Colors.blue, size: 26),
                   )
                 ],
               )),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/route_manager.dart';
 
-import '../helpers/ad_helper.dart';
+// import '../helpers/ad_helper.dart';
 import '../main.dart';
 import 'home_screen.dart';
 
@@ -21,8 +21,8 @@ class _SplashScreenState extends State<SplashScreen> {
       //exit full-screen
       // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-      AdHelper.precacheInterstitialAd();
-      AdHelper.precacheNativeAd();
+      // AdHelper.precacheInterstitialAd();
+      // AdHelper.precacheNativeAd();
 
       //navigate to home
       Get.off(() => HomeScreen());
@@ -53,8 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
               child: Text(
                 'MADE IN Pakistan WITH ❤️ALI',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Theme.of(context).lightText, letterSpacing: 1),
+                style: TextStyle(color: Theme.of(context).lightText, letterSpacing: 1),
               ))
         ],
       ),
