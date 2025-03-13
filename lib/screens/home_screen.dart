@@ -16,6 +16,7 @@ import '../widgets/home_card.dart';
 import '../widgets/watch_ad_dialog.dart';
 import 'location_screen.dart';
 import 'network_test_screen.dart';
+import '../models/vpn.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -71,71 +72,125 @@ class HomeScreen extends StatelessWidget {
       bottomNavigationBar: _changeLocation(context),
 
       //body
-      body: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-        //vpn button
-        Obx(() => _vpnButton()),
+      body: FutureBuilder<List<Vpn>>(
+        future: _loadVpnList(), // Your VPN list loading function
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            // Auto-select first VPN when list is loaded
+            _controller.selectFirstVpn(snapshot.data!);
 
-        Obx(
-          () => Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              //country flag
-              HomeCard(
-                  title: _controller.vpn.value.countryLong.isEmpty ? 'Country' : _controller.vpn.value.countryLong,
-                  subtitle: 'FREE',
-                  icon: CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.blue,
-                    child: _controller.vpn.value.countryLong.isEmpty
-                        ? Icon(Icons.vpn_lock_rounded, size: 30, color: Colors.white)
-                        : null,
-                    backgroundImage: _controller.vpn.value.countryLong.isEmpty
-                        ? null
-                        : AssetImage('assets/flags/${_controller.vpn.value.countryShort.toLowerCase()}.png'),
-                  )),
+            return Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+              //vpn button
+              Obx(() => _vpnButton()),
 
-              //ping time
-              HomeCard(
-                  title: _controller.vpn.value.countryLong.isEmpty ? '100 ms' : '${_controller.vpn.value.ping} ms',
-                  subtitle: 'PING',
-                  icon: CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.orange,
-                    child: Icon(Icons.equalizer_rounded, size: 30, color: Colors.white),
-                  )),
-            ],
-          ),
-        ),
-
-        StreamBuilder<VpnStatus?>(
-            initialData: VpnStatus(),
-            stream: VpnEngine.vpnStatusSnapshot(),
-            builder: (context, snapshot) => Row(
+              Obx(
+                () => Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    //download
+                    //country flag
                     HomeCard(
-                        title: '${snapshot.data?.byteIn ?? '0 kbps'}',
-                        subtitle: 'DOWNLOAD',
-                        icon: CircleAvatar(
-                          radius: 30,
-                          backgroundColor: Colors.lightGreen,
-                          child: Icon(Icons.arrow_downward_rounded, size: 30, color: Colors.white),
-                        )),
-
-                    //upload
-                    HomeCard(
-                        title: '${snapshot.data?.byteOut ?? '0 kbps'}',
-                        subtitle: 'UPLOAD',
+                        title:
+                            _controller.vpn.value.countryLong.isEmpty ? 'Country' : _controller.vpn.value.countryLong,
+                        subtitle: 'FREE',
                         icon: CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.blue,
-                          child: Icon(Icons.arrow_upward_rounded, size: 30, color: Colors.white),
+                          child: _controller.vpn.value.countryLong.isEmpty
+                              ? Icon(Icons.vpn_lock_rounded, size: 30, color: Colors.white)
+                              : null,
+                          backgroundImage: _controller.vpn.value.countryLong.isEmpty
+                              ? null
+                              : AssetImage('assets/flags/${_controller.vpn.value.countryShort.toLowerCase()}.png'),
+                        )),
+
+                    //ping time
+                    HomeCard(
+                        title:
+                            _controller.vpn.value.countryLong.isEmpty ? '100 ms' : '${_controller.vpn.value.ping} ms',
+                        subtitle: 'PING',
+                        icon: CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.orange,
+                          child: Icon(Icons.equalizer_rounded, size: 30, color: Colors.white),
                         )),
                   ],
-                ))
-      ]),
+                ),
+              ),
+
+              StreamBuilder<VpnStatus?>(
+                  initialData: VpnStatus(),
+                  stream: VpnEngine.vpnStatusSnapshot(),
+                  builder: (context, snapshot) => Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          //download
+                          HomeCard(
+                              title: '${snapshot.data?.byteIn ?? '0 kbps'}',
+                              subtitle: 'DOWNLOAD',
+                              icon: CircleAvatar(
+                                radius: 30,
+                                backgroundColor: Colors.lightGreen,
+                                child: Icon(Icons.arrow_downward_rounded, size: 30, color: Colors.white),
+                              )),
+
+                          //upload
+                          HomeCard(
+                              title: '${snapshot.data?.byteOut ?? '0 kbps'}',
+                              subtitle: 'UPLOAD',
+                              icon: CircleAvatar(
+                                radius: 30,
+                                backgroundColor: Colors.blue,
+                                child: Icon(Icons.arrow_upward_rounded, size: 30, color: Colors.white),
+                              )),
+                        ],
+                      ))
+            ]);
+          }
+          return Center(child: CircularProgressIndicator());
+        },
+      ),
     );
+  }
+
+  Future<List<Vpn>> _loadVpnList() async {
+    return [
+      Vpn(
+        hostname: 'us-free-1.vpn.com',
+        ip: '192.168.1.1',
+        ping: '20',
+        speed: '1000',
+        countryLong: 'United States',
+        countryShort: 'US',
+        numVpnSessions: 1,
+        config: '''client
+dev tun
+proto udp
+remote us-free-1.vpn.com 1194
+cipher AES-256-CBC
+auth SHA256
+persist-tun
+nobind
+verb 3''',
+      ),
+      Vpn(
+        hostname: 'jp-free-1.vpn.com',
+        ip: '192.168.1.2',
+        ping: '50',
+        speed: '500',
+        countryLong: 'Japan',
+        countryShort: 'JP',
+        numVpnSessions: 1,
+        config: '''client
+dev tun
+proto udp
+remote jp-free-1.vpn.com 1194
+cipher AES-256-CBC
+auth SHA256
+persist-tun
+nobind
+verb 3''',
+      ),
+    ];
   }
 
   //vpn button

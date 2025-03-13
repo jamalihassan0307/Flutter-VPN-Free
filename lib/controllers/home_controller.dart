@@ -1,13 +1,13 @@
-import 'dart:convert';
+// import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../helpers/ad_helper.dart';
-import '../helpers/my_dialogs.dart';
-import '../helpers/pref.dart';
+// import '../helpers/ad_helper.dart';
+// import '../helpers/my_dialogs.dart';
+// import '../helpers/pref.dart';
 import '../models/vpn.dart';
-import '../models/vpn_config.dart';
+// import '../models/vpn_config.dart';
 import '../services/vpn_engine.dart';
 
 class HomeController extends GetxController {
@@ -23,20 +23,31 @@ class HomeController extends GetxController {
   ).obs;
   final vpnState = VpnEngine.vpnDisconnected.obs;
 
+  void selectFirstVpn(List<Vpn> vpnList) {
+    if (vpnList.isNotEmpty && vpn.value.config.isEmpty) {
+      vpn.value = vpnList[0];
+      print('Auto-selected first VPN: ${vpn.value.hostname}');
+    }
+  }
+
   void connectToVpn() async {
     if (vpn.value.config.isEmpty) {
-      Get.snackbar('Selection Required', 'Please select a VPN configuration first!');
+      print('No VPN Selected');
+      Get.snackbar('Selection Required', 'Please wait while we connect to the best server...');
       return;
     }
 
     if (vpnState.value == VpnEngine.vpnDisconnected) {
       try {
         await VpnEngine.startVpn(vpn.value.config);
+        Get.snackbar('Connection Successful', 'Connected to ${vpn.value.countryLong}',
+            backgroundColor: Colors.green, colorText: Colors.white, duration: Duration(seconds: 3));
       } catch (e) {
         Get.snackbar('Connection Failed', 'Error: ${e.toString()}');
       }
     } else {
       await VpnEngine.stopVpn();
+      Get.snackbar('Disconnected', 'VPN connection terminated', backgroundColor: Colors.red, colorText: Colors.white);
     }
   }
 
