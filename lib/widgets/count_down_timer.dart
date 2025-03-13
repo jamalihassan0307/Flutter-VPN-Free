@@ -16,7 +16,7 @@ class _CountDownTimerState extends State<CountDownTimer> {
   Timer? _timer;
 
   _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         _duration = Duration(seconds: _duration.inSeconds + 1);
       });
@@ -33,8 +33,7 @@ class _CountDownTimerState extends State<CountDownTimer> {
 
   @override
   Widget build(BuildContext context) {
-    if (_timer == null || !widget.startTimer)
-      widget.startTimer ? _startTimer() : _stopTimer();
+    if (_timer == null || !widget.startTimer) widget.startTimer ? _startTimer() : _stopTimer();
 
     String twoDigit(int n) => n.toString().padLeft(2, '0');
     final minutes = twoDigit(_duration.inMinutes.remainder(60));
