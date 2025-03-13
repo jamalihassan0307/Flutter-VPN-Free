@@ -12,12 +12,17 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.net.InetSocketAddress
+import java.nio.channels.DatagramChannel
 
 class OpenVpnService : VpnService() {
     private val TAG = "OpenVpnService"
     private var vpnInterface: ParcelFileDescriptor? = null
     private var configString: String? = null
     private var isRunning = false
+    private var connectionThread: Thread? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -56,9 +61,9 @@ class OpenVpnService : VpnService() {
         configString = intent?.getStringExtra("config")
         if (configString != null && !isRunning) {
             isRunning = true
-            Thread {
+            connectionThread = Thread {
                 startVpn(configString!!)
-            }.start()
+            }.apply { start() }
         }
         return START_STICKY
     }
@@ -67,67 +72,91 @@ class OpenVpnService : VpnService() {
         return null
     }
 
-    fun startVpn(config: String) {
+    private fun startVpn(config: String) {
         try {
-            Log.d(TAG, "Starting VPN connection with config: ${config.take(20)}...")
-            Handler(Looper.getMainLooper()).post {
-                MainActivity.updateVpnStatus("CONNECTING")
-            }
+            updateStatus("CONNECTING")
+            Log.d(TAG, "Starting VPN with config: ${config.take(50)}...")
+
+            // Parse config
+            val serverAddress = config.lines()
+                .find { it.startsWith("remote ") }
+                ?.split(" ")
+                ?.get(1) ?: throw Exception("Server address not found in config")
             
+            val port = config.lines()
+                .find { it.startsWith("remote ") }
+                ?.split(" ")
+                ?.get(2)?.toIntOrNull() ?: 1194
+
             // Create VPN interface
             val builder = Builder()
                 .setSession("OpenVPN")
-                .addAddress("10.0.0.2", 24)
+                .addAddress("10.8.0.2", 24)
                 .addDnsServer("8.8.8.8")
                 .addRoute("0.0.0.0", 0)
                 .setMtu(1500)
                 .allowFamily(android.system.OsConstants.AF_INET)
-                .allowFamily(android.system.OsConstants.AF_INET6)
                 .allowBypass()
 
-            vpnInterface = builder.establish()
+            vpnInterface = builder.establish() ?: throw Exception("Failed to establish VPN interface")
+
+            // Create UDP channel
+            val tunnel = DatagramChannel.open()
+            tunnel.connect(InetSocketAddress(serverAddress, port))
+            protect(tunnel.socket())
+
+            // Start tunnel
+            val vpnInput = FileInputStream(vpnInterface!!.fileDescriptor)
+            val vpnOutput = FileOutputStream(vpnInterface!!.fileDescriptor)
             
-            if (vpnInterface != null) {
-                Log.d(TAG, "VPN interface established")
-                Handler(Looper.getMainLooper()).post {
-                    MainActivity.updateVpnStatus("CONNECTED")
+            updateStatus("CONNECTED")
+            
+            // Keep connection alive
+            val buffer = ByteArray(32767)
+            while (isRunning) {
+                val length = vpnInput.read(buffer)
+                if (length > 0) {
+                    // Process incoming packets
+                    tunnel.write(java.nio.ByteBuffer.wrap(buffer, 0, length))
                 }
                 
-                // Keep service alive
-                while (isRunning && vpnInterface != null) {
-                    Thread.sleep(1000)
-                }
-            } else {
-                Log.e(TAG, "Failed to establish VPN interface")
-                Handler(Looper.getMainLooper()).post {
-                    MainActivity.updateVpnStatus("FAILED")
+                // Process outgoing packets
+                val packet = java.nio.ByteBuffer.allocate(32767)
+                if (tunnel.read(packet) > 0) {
+                    packet.flip()
+                    vpnOutput.write(packet.array(), 0, packet.limit())
                 }
             }
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error starting VPN: ${e.message}")
-            Handler(Looper.getMainLooper()).post {
-                MainActivity.updateVpnStatus("FAILED")
-            }
+            Log.e(TAG, "VPN Error: ${e.message}")
+            updateStatus("FAILED")
         } finally {
             isRunning = false
+            cleanup()
+        }
+    }
+
+    private fun cleanup() {
+        try {
+            vpnInterface?.close()
+            vpnInterface = null
+        } catch (e: Exception) {
+            Log.e(TAG, "Error cleaning up: ${e.message}")
+        }
+    }
+
+    private fun updateStatus(status: String) {
+        Handler(Looper.getMainLooper()).post {
+            MainActivity.updateVpnStatus(status)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         isRunning = false
-        stopVpn()
-    }
-
-    private fun stopVpn() {
-        try {
-            vpnInterface?.close()
-            vpnInterface = null
-            Log.d(TAG, "VPN stopped")
-            MainActivity.updateVpnStatus("DISCONNECTED")
-        } catch (e: Exception) {
-            Log.e(TAG, "Error stopping VPN: ${e.message}")
-        }
+        connectionThread?.interrupt()
+        cleanup()
+        updateStatus("DISCONNECTED")
     }
 } 
