@@ -33,30 +33,24 @@ class VpnCard extends StatelessWidget {
 
             if (controller.vpnState.value == VpnEngine.vpnConnected) {
               VpnEngine.stopVpn();
-              Future.delayed(
-                  Duration(seconds: 2), () => controller.connectToVpn());
+              Future.delayed(Duration(seconds: 2), () => controller.connectToVpn());
             } else {
               controller.connectToVpn();
             }
           },
           borderRadius: BorderRadius.circular(15),
           child: ListTile(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
 
             //flag
             leading: Container(
               padding: EdgeInsets.all(.5),
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black12),
-                  borderRadius: BorderRadius.circular(5)),
+              decoration:
+                  BoxDecoration(border: Border.all(color: Colors.black12), borderRadius: BorderRadius.circular(5)),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(5),
-                child: Image.asset(
-                    'assets/flags/${vpn.countryShort.toLowerCase()}.png',
-                    height: 40,
-                    width: mq.width * .15,
-                    fit: BoxFit.cover),
+                child: Image.asset('assets/flags/${vpn.countryShort.toLowerCase()}.png',
+                    height: 40, width: mq.width * .15, fit: BoxFit.cover),
               ),
             ),
 
@@ -77,10 +71,7 @@ class VpnCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(vpn.numVpnSessions.toString(),
-                    style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Theme.of(context).lightText)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Theme.of(context).lightText)),
                 SizedBox(width: 4),
                 Icon(CupertinoIcons.person_3, color: Colors.blue),
               ],
@@ -89,10 +80,15 @@ class VpnCard extends StatelessWidget {
         ));
   }
 
-  String _formatBytes(int bytes, int decimals) {
-    if (bytes <= 0) return "0 B";
-    const suffixes = ['Bps', "Kbps", "Mbps", "Gbps", "Tbps"];
-    var i = (log(bytes) / log(1024)).floor();
-    return '${(bytes / pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
+  String _formatBytes(String speed, int decimals) {
+    try {
+      final bytes = int.parse(speed);
+      if (bytes <= 0) return "0 B";
+      const suffixes = ['Bps', "Kbps", "Mbps", "Gbps", "Tbps"];
+      var i = (log(bytes) / log(1024)).floor();
+      return '${(bytes / pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
+    } catch (e) {
+      return '0 B';
+    }
   }
 }

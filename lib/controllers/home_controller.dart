@@ -11,7 +11,16 @@ import '../models/vpn_config.dart';
 import '../services/vpn_engine.dart';
 
 class HomeController extends GetxController {
-  final vpn = VPN().obs;
+  final vpn = Vpn(
+    hostname: '',
+    ip: '',
+    ping: '',
+    speed: '',
+    countryLong: '',
+    countryShort: '',
+    numVpnSessions: 0,
+    config: '',
+  ).obs;
   final vpnState = VpnEngine.vpnDisconnected.obs;
 
   void connectToVpn() async {
