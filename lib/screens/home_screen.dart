@@ -163,14 +163,14 @@ class HomeScreen extends StatelessWidget {
         countryShort: 'US',
         numVpnSessions: 1,
         config: '''client
-dev tun
-proto udp
-remote us-free-1.vpn.com 1194
-cipher AES-256-CBC
-auth SHA256
-persist-tun
-nobind
-verb 3''',
+        dev tun
+        proto udp
+        remote us-free-1.vpn.com 1194
+        cipher AES-256-CBC
+        auth SHA256
+        persist-tun
+        nobind
+        verb 3''',
       ),
       Vpn(
         hostname: 'jp-free-1.vpn.com',
@@ -181,14 +181,14 @@ verb 3''',
         countryShort: 'JP',
         numVpnSessions: 1,
         config: '''client
-dev tun
-proto udp
-remote jp-free-1.vpn.com 1194
-cipher AES-256-CBC
-auth SHA256
-persist-tun
-nobind
-verb 3''',
+        dev tun
+        proto udp
+        remote jp-free-1.vpn.com 1194
+        cipher AES-256-CBC
+        auth SHA256
+        persist-tun
+        nobind
+        verb 3''',
       ),
     ];
   }
