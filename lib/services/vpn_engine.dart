@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import '../models/vpn_status.dart';
 
 class VpnEngine {
-  static const _platform = MethodChannel('vpn_engine');
+  static const MethodChannel _channel = MethodChannel('vpn_engine');
   static final _statusController = StreamController<String>.broadcast();
   static bool _prepared = false;
 
@@ -23,16 +23,15 @@ class VpnEngine {
   }
 
   ///Start VPN easily
-  static Future<void> startVpn(String config) async {
-    print('Starting VPN with config: ${config.substring(0, 20)}...');
+  static Future<void> startVpn() async {
+    print('Starting VPN');
     try {
-      await _platform.invokeMethod('startVpn', {'config': config});
+      await _channel.invokeMethod('start');
       print('VPN start command sent successfully');
       _emitStatus(vpnConnecting);
-    } catch (e) {
-      print('Error starting VPN: $e');
+    } on PlatformException catch (e) {
+      print('Error starting VPN: ${e.message}');
       _emitStatus(vpnDisconnected);
-      throw e;
     }
   }
 
@@ -40,31 +39,30 @@ class VpnEngine {
   static Future<void> stopVpn() async {
     print('Stopping VPN');
     try {
-      await _platform.invokeMethod('stopVpn');
+      await _channel.invokeMethod('stop');
       print('VPN stop command sent successfully');
       _emitStatus(vpnDisconnected);
-    } catch (e) {
-      print('Error stopping VPN: $e');
-      throw e;
+    } on PlatformException catch (e) {
+      print('Error stopping VPN: ${e.message}');
     }
   }
 
   ///Open VPN Settings
   static Future<void> openKillSwitch() {
     print('Opening kill switch settings');
-    return _platform.invokeMethod("kill_switch");
+    return _channel.invokeMethod("kill_switch");
   }
 
   ///Trigger native to get stage connection
   static Future<void> refreshStage() {
     print('Refreshing VPN stage');
-    return _platform.invokeMethod("refresh");
+    return _channel.invokeMethod("refresh");
   }
 
   ///Get latest stage
   static Future<String?> stage() async {
     print('Getting current VPN stage');
-    final result = await _platform.invokeMethod("stage");
+    final result = await _channel.invokeMethod("stage");
     print('Current stage: $result');
     return result;
   }
@@ -72,7 +70,7 @@ class VpnEngine {
   ///Check if vpn is connected
   static Future<bool> isConnected() async {
     print('Checking if VPN is connected');
-    final result = await _platform.invokeMethod<bool>("check") ?? false;
+    final result = await _channel.invokeMethod<bool>("check") ?? false;
     print('VPN connected: $result');
     return result;
   }
@@ -89,20 +87,22 @@ class VpnEngine {
   static const String vpnDenied = "DENIED";
 
   ///Initialize VPN Engine
-  static Future<void> initialize() async {
+  static Future<bool> initialize() async {
     print('Initializing VPN engine');
     if (!_prepared) {
       try {
-        await _platform.invokeMethod('prepare');
+        final bool prepared = await _channel.invokeMethod('prepare');
         _prepared = true;
         print('VPN engine initialized successfully');
         _setupMethodCallHandler();
-      } catch (e) {
-        print('Error initializing VPN engine: $e');
-        throw e;
+        return prepared;
+      } on PlatformException catch (e) {
+        print('Error initializing VPN engine: ${e.message}');
+        return false;
       }
     } else {
       print('VPN engine already initialized');
+      return true;
     }
   }
 
@@ -113,7 +113,7 @@ class VpnEngine {
   }
 
   static void _setupMethodCallHandler() {
-    _platform.setMethodCallHandler((call) async {
+    _channel.setMethodCallHandler((call) async {
       print('Received method call: ${call.method}');
       switch (call.method) {
         case 'onVpnPermissionGranted':

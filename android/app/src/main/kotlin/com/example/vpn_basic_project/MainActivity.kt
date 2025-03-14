@@ -14,12 +14,13 @@ import de.blinkt.openvpn.core.ConfigParser
 import android.app.ActivityManager
 import android.content.Context
 import io.flutter.plugin.common.EventChannel
+import android.app.Activity
 
 class MainActivity: FlutterActivity() {
-    private val CHANNEL = "vpn_channel"
+    private val CHANNEL = "vpn_engine"
     private val EVENT_CHANNEL = "vpn_status"
     private val TAG = "VPNEngine"
-    private val REQUEST_VPN_PERMISSION = 1
+    private val REQUEST_CODE = 1
     private var vpnService: OpenVPNService? = null
 
     companion object {
@@ -38,33 +39,26 @@ class MainActivity: FlutterActivity() {
         methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
         methodChannel?.setMethodCallHandler { call, result ->
             when (call.method) {
-                "startVpn" -> {
-                    val config = call.argument<String>("config")
-                    if (config != null) {
-                        startVpnService(config)
-                        result.success(null)
+                "prepare" -> {
+                    val intent = VpnService.prepare(context)
+                    if (intent != null) {
+                        startActivityForResult(intent, REQUEST_CODE)
+                        result.success(false)
                     } else {
-                        result.error("CONFIG_ERROR", "VPN config is null", null)
+                        result.success(true)
                     }
                 }
-                "stopVpn" -> {
+                "start" -> {
+                    startVpnService()
+                    result.success(null)
+                }
+                "stop" -> {
                     stopVpnService()
                     result.success(null)
                 }
-                "prepare" -> {
-                    try {
-                        Log.d(TAG, "Preparing VPN")
-                        val intent = VpnService.prepare(context)
-                        if (intent != null) {
-                            startActivityForResult(intent, REQUEST_VPN_PERMISSION)
-                        }
-                        result.success(null)
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error preparing VPN: ${e.message}")
-                        result.error("VPN_PREPARE_ERROR", e.message, null)
-                    }
+                else -> {
+                    result.notImplemented()
                 }
-                else -> result.notImplemented()
             }
         }
 
@@ -81,30 +75,19 @@ class MainActivity: FlutterActivity() {
         )
     }
 
-    private fun startVpnService(config: String) {
-        val intent = Intent(this, OpenVPNService::class.java)
-        intent.putExtra("config", config)
-        startForegroundService(intent)
+    private fun startVpnService() {
+        val serviceIntent = Intent(this, VpnService::class.java)
+        startService(serviceIntent)
     }
 
     private fun stopVpnService() {
-        val intent = Intent(this, OpenVPNService::class.java)
-        stopService(intent)
+        val serviceIntent = Intent(this, VpnService::class.java)
+        stopService(serviceIntent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_VPN_PERMISSION) {
-            if (resultCode == RESULT_OK) {
-                Log.d(TAG, "VPN permission granted")
-                // Notify Flutter about permission granted
-                MethodChannel(flutterEngine?.dartExecutor?.binaryMessenger!!, CHANNEL)
-                    .invokeMethod("onVpnPermissionGranted", null)
-            } else {
-                Log.d(TAG, "VPN permission denied")
-                // Notify Flutter about permission denied
-                MethodChannel(flutterEngine?.dartExecutor?.binaryMessenger!!, CHANNEL)
-                    .invokeMethod("onVpnPermissionDenied", null)
-            }
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            startVpnService()
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
