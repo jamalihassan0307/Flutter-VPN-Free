@@ -8,19 +8,12 @@ class VpnService {
   static final _statusController = StreamController<String>.broadcast();
   static bool _prepared = false;
 
-  // VPN States
-  static const String vpnDisconnected = "DISCONNECTED";
-  static const String vpnConnected = "CONNECTED";
-  static const String vpnConnecting = "CONNECTING";
-  static const String vpnWaitConnection = "WAIT_CONNECTION";
-  static const String vpnAuthenticating = "AUTHENTICATING";
-  static const String vpnReconnect = "RECONNECT";
-  static const String vpnNoConnection = "NO_CONNECTION";
-
   static Stream<String> vpnStageSnapshot() => _statusController.stream;
-
+  
   static Stream<VpnStatus?> vpnStatusSnapshot() {
-    return _statusController.stream.map((event) => VpnStatus(byteIn: event, byteOut: event));
+    return _statusController.stream.map((event) => 
+      VpnStatus(byteIn: event, byteOut: event)
+    );
   }
 
   static Future<void> initialize() async {
@@ -54,4 +47,4 @@ class VpnService {
       rethrow;
     }
   }
-}
+} 

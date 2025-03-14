@@ -1,13 +1,13 @@
 class VpnConfig {
-  final String name;
-  final String config;
-  final String? username;
-  final String? password;
-
   VpnConfig({
-    required this.name,
+    required this.country,
+    required this.username,
+    required this.password,
     required this.config,
-    this.username,
-    this.password,
   });
+
+  final String country;
+  final String username;
+  final String password;
+  final String config;
 }
