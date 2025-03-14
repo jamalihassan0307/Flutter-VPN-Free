@@ -41,12 +41,8 @@ class HomeController extends GetxController {
     if (vpnState.value == VpnEngine.vpnDisconnected) {
       try {
         await VpnService.startVpn(vpn.value.config);
-        Get.snackbar(
-          'Connection Successful', 
-          'Connected to ${vpn.value.countryLong}',
-          backgroundColor: Colors.green,
-          colorText: Colors.white
-        );
+        Get.snackbar('Connection Successful', 'Connected to ${vpn.value.countryLong}',
+            backgroundColor: Colors.green, colorText: Colors.white);
       } catch (e) {
         Get.snackbar('Connection Failed', 'Error: ${e.toString()}');
       }
