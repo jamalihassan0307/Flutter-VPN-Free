@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    namespace "de.blinkt.openvpn"
     compileSdkVersion 34
 
     defaultConfig {
