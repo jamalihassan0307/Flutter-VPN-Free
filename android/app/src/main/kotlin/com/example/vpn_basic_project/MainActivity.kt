@@ -8,11 +8,19 @@ import android.content.Intent
 import android.util.Log
 import android.os.Handler
 import android.os.Looper
+import de.blinkt.openvpn.core.OpenVPNService
+import de.blinkt.openvpn.VpnProfile
+import de.blinkt.openvpn.core.ConfigParser
+import android.app.ActivityManager
+import android.content.Context
+import io.flutter.plugin.common.EventChannel
 
 class MainActivity: FlutterActivity() {
-    private val CHANNEL = "vpn_engine"
+    private val CHANNEL = "vpn_channel"
+    private val EVENT_CHANNEL = "vpn_status"
     private val TAG = "VPNEngine"
     private val REQUEST_VPN_PERMISSION = 1
+    private var vpnService: OpenVPNService? = null
 
     companion object {
         private var methodChannel: MethodChannel? = null
@@ -31,44 +39,17 @@ class MainActivity: FlutterActivity() {
         methodChannel?.setMethodCallHandler { call, result ->
             when (call.method) {
                 "startVpn" -> {
-                    try {
-                        Log.d(TAG, "Preparing to start VPN")
-                        val config = call.argument<String>("config")
-                        if (config == null) {
-                            throw Exception("VPN configuration is null")
-                        }
-
-                        // Check VPN permission
-                        val vpnIntent = VpnService.prepare(context)
-                        if (vpnIntent != null) {
-                            Log.d(TAG, "Requesting VPN permission")
-                            startActivityForResult(vpnIntent, REQUEST_VPN_PERMISSION)
-                            result.error("PERMISSION_DENIED", "VPN permission required", null)
-                            return@setMethodCallHandler
-                        }
-
-                        // Start VPN service
-                        Log.d(TAG, "Starting VPN service")
-                        val serviceIntent = Intent(this, OpenVpnService::class.java)
-                        serviceIntent.putExtra("config", config)
-                        startForegroundService(serviceIntent)
+                    val config = call.argument<String>("config")
+                    if (config != null) {
+                        startVpnService(config)
                         result.success(null)
-                        
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error starting VPN: ${e.message}")
-                        result.error("VPN_START_ERROR", e.message, null)
+                    } else {
+                        result.error("CONFIG_ERROR", "VPN config is null", null)
                     }
                 }
                 "stopVpn" -> {
-                    try {
-                        Log.d(TAG, "Stopping VPN")
-                        val serviceIntent = Intent(this, OpenVpnService::class.java)
-                        stopService(serviceIntent)
-                        result.success(null)
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error stopping VPN: ${e.message}")
-                        result.error("VPN_STOP_ERROR", e.message, null)
-                    }
+                    stopVpnService()
+                    result.success(null)
                 }
                 "prepare" -> {
                     try {
@@ -86,6 +67,29 @@ class MainActivity: FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+
+        EventChannel(flutterEngine.dartExecutor, EVENT_CHANNEL).setStreamHandler(
+            object : EventChannel.StreamHandler {
+                override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                    // Handle VPN status updates
+                }
+
+                override fun onCancel(arguments: Any?) {
+                    // Cleanup
+                }
+            }
+        )
+    }
+
+    private fun startVpnService(config: String) {
+        val intent = Intent(this, OpenVPNService::class.java)
+        intent.putExtra("config", config)
+        startForegroundService(intent)
+    }
+
+    private fun stopVpnService() {
+        val intent = Intent(this, OpenVPNService::class.java)
+        stopService(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
