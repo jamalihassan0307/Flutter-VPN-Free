@@ -1,9 +1,20 @@
 buildscript {
-    ext.kotlin_version = '1.7.10'
+    ext {
+        kotlin_version = '1.7.10'
+        compileSdkVersion = 33
+        minSdkVersion = 21
+        targetSdkVersion = 33
+        
+        // Add version constants
+        coreVersion = '1.7.0'
+        appCompatVersion = '1.4.1'
+        lifecycleVersion = '2.4.0'
+        workVersion = '2.7.0'
+    }
+    
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
     }
 
     dependencies {
@@ -16,7 +27,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
     }
 }
 
