@@ -2,13 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter/services.dart';
 
 // import '../helpers/ad_helper.dart';
 // import '../helpers/my_dialogs.dart';
 // import '../helpers/pref.dart';
 import '../models/vpn.dart';
-// import '../models/vpn_config.dart';
-import '../services/vpn_engine.dart';
+import '../models/vpn_config.dart';
 import '../services/vpn_service.dart';
 
 class HomeController extends GetxController {
@@ -22,42 +22,67 @@ class HomeController extends GetxController {
     numVpnSessions: 0,
     config: '',
   ).obs;
-  final vpnState = VpnEngine.vpnDisconnected.obs;
 
-  void selectFirstVpn(List<Vpn> vpnList) {
-    if (vpnList.isNotEmpty && vpn.value.config.isEmpty) {
-      vpn.value = vpnList[0];
-      print('Auto-selected first VPN: ${vpn.value.hostname}');
+  final vpnState = VpnService.vpnDisconnected.obs;
+  final List<VpnConfig> _vpnConfigs = [];
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadVpnConfigs();
+    _initVpnService();
+  }
+
+  Future<void> _loadVpnConfigs() async {
+    // Load VPN configs from assets
+    final configFiles = [
+      'Ecuador',
+      'Indonesia',
+      'Korea Republic of',
+      'Romania',
+      'Russian Federation',
+      'Taiwan',
+      'United States',
+      'Viet Nam'
+    ];
+
+    for (var country in configFiles) {
+      final config = await rootBundle.loadString('assets/vpn/$country.ovpn');
+      _vpnConfigs.add(VpnConfig(name: country, config: config));
     }
   }
 
-  void connectToVpn() async {
+  Future<void> _initVpnService() async {
+    await VpnService.initialize();
+    VpnService.vpnStageSnapshot().listen((state) {
+      vpnState.value = state;
+    });
+  }
+
+  Future<void> connectToVpn() async {
     if (vpn.value.config.isEmpty) {
-      print('No VPN Selected');
-      Get.snackbar('Selection Required', 'Please select a VPN server first');
+      Get.snackbar('Error', 'Please select a VPN server first');
       return;
     }
 
-    if (vpnState.value == VpnEngine.vpnDisconnected) {
-      try {
+    try {
+      if (vpnState.value == VpnService.vpnDisconnected) {
         await VpnService.startVpn(vpn.value.config);
-        Get.snackbar('Connection Successful', 'Connected to ${vpn.value.countryLong}',
-            backgroundColor: Colors.green, colorText: Colors.white);
-      } catch (e) {
-        Get.snackbar('Connection Failed', 'Error: ${e.toString()}');
+      } else {
+        await VpnService.stopVpn();
       }
-    } else {
-      await VpnService.stopVpn();
+    } catch (e) {
+      Get.snackbar('Error', e.toString());
     }
   }
 
   // vpn buttons color
   Color get getButtonColor {
     switch (vpnState.value) {
-      case VpnEngine.vpnDisconnected:
+      case VpnService.vpnDisconnected:
         return Colors.blue;
 
-      case VpnEngine.vpnConnected:
+      case VpnService.vpnConnected:
         return Colors.green;
 
       default:
@@ -67,8 +92,14 @@ class HomeController extends GetxController {
 
   // vpn button text
   String get getButtonText {
-    if (vpnState.value == VpnEngine.vpnDisconnected) return 'Connect VPN';
-    if (vpnState.value == VpnEngine.vpnConnected) return 'Disconnect VPN';
+    if (vpnState.value == VpnService.vpnDisconnected) return 'Connect VPN';
+    if (vpnState.value == VpnService.vpnConnected) return 'Disconnect VPN';
     return 'Connecting...';
+  }
+
+  void selectFirstVpn(List<Vpn> vpnList) {
+    if (vpnList.isNotEmpty && vpn.value.config.isEmpty) {
+      vpn.value = vpnList[0];
+    }
   }
 }
