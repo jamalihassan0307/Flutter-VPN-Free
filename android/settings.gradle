@@ -1,9 +1,9 @@
 pluginManagement {
     repositories {
+        gradlePluginPortal()
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
-        gradlePluginPortal()
     }
 }
 
@@ -13,12 +13,13 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url 'https://storage.googleapis.com/download.flutter.io' }
     }
 }
 
 rootProject.name = "android"
 include ':app'
+include ':vpnLib'
 
 def flutterProjectRoot = rootProject.projectDir.parentFile.toPath()
 
