@@ -1,20 +1,4 @@
 pluginManagement {
-    def flutterSdkPath = {
-        def properties = new Properties()
-        def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
-        if (localPropertiesFile.exists()) {
-            localPropertiesFile.withReader("UTF-8") { reader -> properties.load(reader) }
-        }
-
-        def flutterSdk = properties.getProperty("flutter.sdk")
-        assert flutterSdk != null, "flutter.sdk not set in local.properties"
-        return flutterSdk
-    }
-
-    plugins {
-        id 'dev.flutter.flutter-gradle-plugin' version '1.0.0' apply false
-    }
-
     repositories {
         google()
         mavenCentral()
@@ -22,8 +6,6 @@ pluginManagement {
         maven { url 'https://jitpack.io' }
         gradlePluginPortal()
     }
-
-    includeBuild("${flutterSdkPath()}/packages/flutter_tools/gradle")
 }
 
 dependencyResolutionManagement {
@@ -54,16 +36,16 @@ plugins.each { name, path ->
     project(":$name").projectDir = pluginDirectory
 }
 
-def flutterSdkPath = {
-    def properties = new Properties()
-    def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
-    if (localPropertiesFile.exists()) {
-        localPropertiesFile.withReader("UTF-8") { reader -> properties.load(reader) }
-    }
+def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
+def properties = new Properties()
 
-    def flutterSdk = properties.getProperty("flutter.sdk")
-    assert flutterSdk != null, "flutter.sdk not set in local.properties"
-    return flutterSdk
-}()
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader("UTF-8") { reader -> properties.load(reader) }
+}
 
-apply from: "${flutterSdkPath}/packages/flutter_tools/gradle/app_plugin_loader.gradle"
+def flutterSdkPath = properties.getProperty("flutter.sdk")
+if (flutterSdkPath == null) {
+    throw new GradleException("flutter.sdk not set in local.properties")
+}
+
+apply from: "$flutterSdkPath/packages/flutter_tools/gradle/app_plugin_loader.gradle"
