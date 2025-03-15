@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/route_manager.dart';
+import 'package:open_nizvpn/controllers/home_controller.dart';
+import 'package:open_nizvpn/controllers/location_controller.dart';
 
 // import '../helpers/ad_helper.dart';
 import '../main.dart';
+import 'package:get/get.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,11 +19,11 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
+    Get.put(HomeController());
+    Get.put(LocationController());
     super.initState();
     Future.delayed(const Duration(milliseconds: 1500), () {
-     
       Get.off(() => HomeScreen());
-     
     });
   }
 

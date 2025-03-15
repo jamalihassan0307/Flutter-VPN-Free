@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'services/vpn_engine.dart';
 import 'screens/splash_screen.dart';
 
 import 'helpers/pref.dart';

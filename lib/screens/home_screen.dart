@@ -19,11 +19,13 @@ import '../models/vpn.dart';
 class HomeScreen extends StatelessWidget {
   HomeScreen();
 
-  final _controller = Get.put(HomeController());
-  final _locationController = Get.put(LocationController());
+  HomeController _controller = Get.put(HomeController());
+  LocationController _locationController = Get.put(LocationController());
 
   @override
   Widget build(BuildContext context) {
+    // _controller = Get.put(HomeController());
+    // _locationController = Get.put(LocationController());
     _controller.initVpn();
     VpnEngine.vpnStageSnapshot().listen((event) {
       _controller.vpnState.value = event;
@@ -63,7 +65,7 @@ class HomeScreen extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             // Auto-select first VPN when list is loaded
-            _controller.selectFirstVpn(snapshot.data!);
+            // _controller.selectFirstVpn(snapshot.data!);
 
             return Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
               //vpn button

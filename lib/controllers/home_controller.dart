@@ -25,10 +25,10 @@ class HomeController extends GetxController {
   final vpnState = VpnEngine.vpnDisconnected.obs;
 
   void selectFirstVpn(List<Vpn> vpnList) {
-    // if (vpnList.isNotEmpty && vpn.value.config.isEmpty) {
-    //   vpn.value = vpnList[0];
-    //   print('Auto-selected first VPN: ${vpn.value.hostname}');
-    // }
+    if (vpnList.isNotEmpty && vpn.value.vpnConfigPath.isEmpty) {
+      vpn.value = vpnList[0];
+      print('Auto-selected first VPN: ${vpn.value.hostname}');
+    }
   }
 
   void connectToVpn() async {
@@ -74,7 +74,7 @@ class HomeController extends GetxController {
 
   VpnConfig? _selectedVpn;
   List<VpnConfig> _listVpn = [];
-  void _connectClick() {
+  void connectClick() {
     ///Stop right here if user not select a vpn
     if (_selectedVpn == null) return;
 
