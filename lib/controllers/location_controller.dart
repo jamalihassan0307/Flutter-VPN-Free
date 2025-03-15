@@ -25,52 +25,52 @@ class LocationController extends GetxController {
   List<Vpn> generateVpnList() {
     final List<Map<String, String>> countryData = [
       {
-        'ipAddress': '219.100.37.56',
-        'hostname': 'public-vpn-94',
-        'country': 'Ecuador',
-        'short': 'EC',
-        'image': 'assets/flags/ec.png',
-        'config': 'assets/vpn/Ecuador.ovpn'
+        'ipAddress': '219.100.37.126',
+        'hostname': 'public-vpn-163.opengw.net',
+        'country': 'Japan',
+        'short': 'japan',
+        'image': 'assets/flags/japan.png',
+        'config': 'assets/vpn/japan.ovpn'
       },
       {
-        'ipAddress': '219.100.37.56',
-        'hostname': 'public-vpn-94',
-        'country': 'Romania',
-        'short': 'RO',
-        'image': 'assets/flags/ro.png',
-        'config': 'assets/vpn/Romania.ovpn'
-      },
-      {
-        'ipAddress': '219.100.37.56',
-        'hostname': 'public-vpn-94',
-        'country': 'Russian Federation',
-        'short': 'RU',
-        'image': 'assets/flags/ru.png',
-        'config': 'assets/vpn/Russian Federation.ovpn'
-      },
-      {
-        'ipAddress': '219.100.37.56',
-        'hostname': 'public-vpn-94',
+        'ipAddress': '122.99.21.46',
+        'hostname': 'jayporeonvpn4.opengw.net',
         'country': 'Taiwan',
         'short': 'TW',
         'image': 'assets/flags/tw.png',
         'config': 'assets/vpn/Taiwan.ovpn'
       },
       {
-        'ipAddress': '219.100.37.56',
-        'hostname': 'public-vpn-94',
+        'ipAddress': '24.18.52.249',
+        'hostname': 'vpn116260047.opengw.net',
         'country': 'United States',
         'short': 'US',
         'image': 'assets/flags/us.png',
         'config': 'assets/vpn/United States.ovpn'
       },
       {
-        'ipAddress': '219.100.37.56',
-        'hostname': 'public-vpn-94',
+        'ipAddress': '210.245.29.220',
+        'hostname': 'vpn358564424.opengw.net',
         'country': 'Viet Nam',
         'short': 'VN',
         'image': 'assets/flags/vn.png',
         'config': 'assets/vpn/Viet Nam.ovpn'
+      },
+      {
+        'ipAddress': '217.138.212.58',
+        'hostname': 'popengw.opengw.net',
+        'country': 'Romania',
+        'short': 'RO',
+        'image': 'assets/flags/ro.png',
+        'config': 'assets/vpn/Romania.ovpn'
+      },
+      {
+        'ipAddress': '2.63.127.91',
+        'hostname': 'vpn994575990.opengw.net',
+        'country': 'Russian Federation',
+        'short': 'RU',
+        'image': 'assets/flags/ru.png',
+        'config': 'assets/vpn/Russian Federation.ovpn'
       },
       {
         'ipAddress': '14.36.22.137',
@@ -78,23 +78,15 @@ class LocationController extends GetxController {
         'country': 'Korea Republic of',
         'short': 'KR',
         'image': 'assets/flags/kr.png',
-        'config': 'assets/vpn/Korea Republic of.ovpn'
+        'config': 'assets/vpn/korea.ovpn'
       },
       {
-        'ipAddress': '219.100.37.56',
-        'hostname': 'public-vpn-94',
+        'ipAddress': '180.243.51.72',
+        'hostname': 'vpn491572721.opengw.net',
         'country': 'Indonesia',
         'short': 'ID',
         'image': 'assets/flags/id.png',
         'config': 'assets/vpn/Indonesia.ovpn'
-      },
-      {
-        'ipAddress': '219.100.37.126',
-        'hostname': 'public-vpn-163.opengw.net',
-        'country': 'Japan',
-        'short': 'japan',
-        'image': 'assets/flags/japan.png',
-        'config': 'assets/vpn/japan.ovpn'
       },
     ];
 
