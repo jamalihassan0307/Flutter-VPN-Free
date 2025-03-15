@@ -18,7 +18,7 @@ Future<void> main() async {
   await Pref.initializeHive();
 
   // Initialize VPN
-  await VpnEngine.initialize();
+  // await VpnEngine.initialize();
 
   // await AdHelper.initAds();
 

@@ -29,7 +29,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       //app bar
       appBar: AppBar(
-        leading: Icon(CupertinoIcons.home),
+        leading: Icon(Icons.home),
         title: Text('Free OpenVPN'),
         actions: [
           IconButton(
