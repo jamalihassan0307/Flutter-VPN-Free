@@ -497,59 +497,40 @@ class HomeScreen extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Outer glowing circle
-            TweenAnimationBuilder(
-              tween: Tween(begin: 0.8, end: 1.0),
-              duration: Duration(milliseconds: 1000),
-              builder: (context, double value, child) {
-                return Transform.scale(
-                  scale: value,
-                  child: Container(
-                    width: 200,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          _controller.getButtonColor.withOpacity(0.5),
-                          _controller.getButtonColor.withOpacity(0.0),
-                        ],
-                      ),
+            // Animated background glow
+            AnimatedBuilder(
+              animation: AnimationController(
+                duration: Duration(seconds: 2),
+                vsync: Navigator.of(context),
+              )..repeat(),
+              builder: (context, child) {
+                return Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        _controller.getButtonColor.withOpacity(0.6),
+                        _controller.getButtonColor.withOpacity(0.0),
+                      ],
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _controller.getButtonColor.withOpacity(0.5),
+                        blurRadius: 30,
+                        spreadRadius: 10,
+                      ),
+                    ],
                   ),
                 );
               },
-              // repeat: true,
             ),
 
-            // Rotating gradient circle
-            TweenAnimationBuilder(
-              tween: Tween(begin: 0.0, end: 1.0),
-              duration: Duration(seconds: 10),
-              builder: (context, double value, child) {
-                return Transform.rotate(
-                  angle: value * 2 * 3.14159,
-                  child: Container(
-                    width: 180,
-                    height: 180,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: SweepGradient(
-                        colors: [
-                          Colors.white.withOpacity(0.3),
-                          Colors.white.withOpacity(0.0),
-                          Colors.white.withOpacity(0.3),
-                        ],
-                        stops: [0.0, 0.5, 1.0],
-                      ),
-                    ),
-                  ),
-                );
-              },
-              // repeat: true,
-            ),
+            // Multiple rotating gradient rings
+            ..._buildRotatingRings(),
 
-            // Main button container with gradient
+            // Main button container
             Container(
               width: 160,
               height: 160,
@@ -574,46 +555,54 @@ class HomeScreen extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Animated circles
+                  // Animated progress circles
                   ..._buildPulsingCircles(),
 
-                  // Center button with icon
-                  _buildCenterButton(),
+                  // Center button with enhanced animation
+                  _buildAnimatedCenterButton(),
                 ],
               ),
             ),
 
-            // Blinking effect when not connected
-            if (_controller.vpnState.value != "connected")
-              TweenAnimationBuilder(
-                tween: Tween(begin: 0.5, end: 1.0),
-                duration: Duration(milliseconds: 1000),
-                builder: (context, double value, child) {
-                  return Container(
-                    width: 200,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: _controller.getButtonColor.withOpacity(value * 0.5),
-                        width: 3,
-                      ),
-                    ),
-                  );
-                },
-                // repeat: true,
-              ),
+            // Dynamic ripple effects
+            if (_controller.vpnState.value == "connecting") ..._buildEnhancedRipples(),
 
-            // Connection ripple effect
-            if (_controller.vpnState.value == "connecting") ..._buildConnectingRipples(),
+            // Status indicator ring
+            _buildStatusRing(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCenterButton() {
-    return Container(
+  List<Widget> _buildRotatingRings() {
+    return List.generate(3, (index) {
+      return TweenAnimationBuilder(
+        tween: Tween(begin: 0.0, end: 1.0),
+        duration: Duration(seconds: 10 - index * 2),
+        builder: (context, double value, child) {
+          return Transform.rotate(
+            angle: value * 2 * 3.14159 * (index % 2 == 0 ? 1 : -1),
+            child: Container(
+              width: 180 - index * 10,
+              height: 180 - index * 10,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 2,
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    });
+  }
+
+  Widget _buildAnimatedCenterButton() {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
       width: 110,
       height: 110,
       decoration: BoxDecoration(
@@ -628,13 +617,16 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       child: AnimatedSwitcher(
-        duration: Duration(milliseconds: 300),
+        duration: Duration(milliseconds: 500),
         transitionBuilder: (Widget child, Animation<double> animation) {
           return ScaleTransition(
             scale: animation,
-            child: FadeTransition(
-              opacity: animation,
-              child: child,
+            child: RotationTransition(
+              turns: animation,
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
             ),
           );
         },
@@ -648,27 +640,48 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildConnectingRipples() {
+  List<Widget> _buildEnhancedRipples() {
     return List.generate(3, (index) {
       return TweenAnimationBuilder(
         tween: Tween(begin: 0.0, end: 1.0),
-        duration: Duration(milliseconds: 1500),
+        duration: Duration(milliseconds: 1500 + index * 200),
         builder: (context, double value, child) {
-          return Container(
-            width: 200 * value,
-            height: 200 * value,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: _controller.getButtonColor.withOpacity(0.3 * (1 - value)),
-                width: 15 * (1 - value),
+          return Opacity(
+            opacity: (1 - value) * 0.8,
+            child: Transform.scale(
+              scale: value,
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: _controller.getButtonColor,
+                    width: (1 - value) * 10,
+                  ),
+                ),
               ),
             ),
           );
         },
-        // repeat: true,
       );
     });
+  }
+
+  Widget _buildStatusRing() {
+    final isConnected = _controller.vpnState.value == "connected";
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 500),
+      width: 200,
+      height: 200,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: isConnected ? Colors.green.withOpacity(0.5) : _controller.getButtonColor.withOpacity(0.3),
+          width: 3,
+        ),
+      ),
+    );
   }
 
   List<Widget> _buildPulsingCircles() {
