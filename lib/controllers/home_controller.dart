@@ -2,14 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:open_nizvpn/controllers/location_controller.dart';
+import 'package:open_nizvpn/core/models/dnsConfig.dart';
+import 'package:open_nizvpn/core/models/vpnConfig.dart';
+import 'package:open_nizvpn/core/utils/nizvpn_engine.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
-// import '../helpers/ad_helper.dart';
-// import '../helpers/my_dialogs.dart';
-// import '../helpers/pref.dart';
 import '../models/vpn.dart';
-// import '../models/vpn_config.dart';
 import '../services/vpn_engine.dart';
-import '../services/vpn_service.dart';
 
 class HomeController extends GetxController {
   final vpn = Vpn(
@@ -70,5 +70,32 @@ class HomeController extends GetxController {
     if (vpnState.value == VpnEngine.vpnDisconnected) return 'Connect VPN';
     if (vpnState.value == VpnEngine.vpnConnected) return 'Disconnect VPN';
     return 'Connecting...';
+  }
+
+  VpnConfig? _selectedVpn;
+  List<VpnConfig> _listVpn = [];
+  void _connectClick() {
+    ///Stop right here if user not select a vpn
+    if (_selectedVpn == null) return;
+
+    if (vpnState.value == VpnEngine.vpnDisconnected) {
+      ///Start if stage is disconnected
+      AliVpn.startVpn(
+        _selectedVpn!,
+        dns: DnsConfig("23.253.163.53", "198.101.242.72"),
+      );
+    } else {
+      ///Stop if stage is "not" disconnected
+      AliVpn.stopVpn();
+    }
+  }
+
+  LocationController _locationController = Get.find();
+  void initVpn() async {
+    for (var i in _locationController.vpnList) {
+      _listVpn.add(VpnConfig(config: await rootBundle.loadString(i.vpnConfigPath), name: i.countryLong));
+    }
+
+    update();
   }
 }
