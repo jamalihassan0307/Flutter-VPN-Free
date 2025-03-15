@@ -14,9 +14,28 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   package_info: ^2.0.2
+  get: ^4.6.6
+  http: ^1.1.0
+  csv: ^5.1.1
+  lottie: ^2.7.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  firebase_core: ^2.24.2
+  firebase_remote_config: ^4.3.8
+  flutter_launcher_icons: "^0.14.3"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
+  min_sdk_android: 21
+  background_color: "#FFFFFF"
 
 flutter:
   uses-material-design: true
   assets:
-    - "assets/"
-    - "assets/vpn/"
+    - assets/
+    - assets/vpn/
+    - assets/images/
+    - assets/lottie/
+    - assets/flags/
