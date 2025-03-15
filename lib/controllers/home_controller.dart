@@ -26,17 +26,38 @@ class HomeController extends GetxController {
 
   void selectFirstVpn(List<Vpn> vpnList) {
     if (vpnList.isNotEmpty && vpn.value.vpnConfigPath.isEmpty) {
-      vpn.value = vpnList[0];
+      vpn.value = vpnList[4];
       print('Auto-selected first VPN: ${vpn.value.hostname}');
     }
   }
 
   void connectToVpn() async {
-    // if (vpn.value.config.isEmpty) {
-    //   print('No VPN Selected');
-    //   Get.snackbar('Selection Required', 'Please select a VPN server first');
-    //   return;
-    // }
+    if (vpn.value.vpnConfigPath.isEmpty) {
+      print('No VPN Selected');
+      Get.snackbar('Selection Required', 'Please select a VPN server first');
+      return;
+    }
+    try {
+      if (_selectedVpn == null) return;
+
+      if (vpnState.value == VpnEngine.vpnDisconnected) {
+        ///Start if stage is disconnected
+        AliVpn.startVpn(
+          _selectedVpn!,
+          dns: DnsConfig("23.253.163.53", "198.101.242.72"),
+        );
+        Get.snackbar('Connection Successful', 'Connected to ${vpn.value.countryLong}',
+            backgroundColor: Colors.green, colorText: Colors.white);
+      } else {
+        Get.snackbar('Connection Stopped', 'Disconnected from ${vpn.value.countryLong}',
+            backgroundColor: Colors.red, colorText: Colors.white);
+      }
+
+      ///Stop if stage is "not" disconnected
+      AliVpn.stopVpn();
+    } catch (e) {
+      Get.snackbar('Connection Failed', 'Error: ${e.toString()}');
+    }
 
     // if (vpnState.value == VpnEngine.vpnDisconnected) {
     //   try {
@@ -90,9 +111,8 @@ class HomeController extends GetxController {
     }
   }
 
-  LocationController _locationController = Get.find();
   void initVpn() async {
-    for (var i in _locationController.vpnList) {
+    for (var i in LocationController.to.vpnList) {
       _listVpn.add(VpnConfig(config: await rootBundle.loadString(i.vpnConfigPath), name: i.countryLong));
     }
 

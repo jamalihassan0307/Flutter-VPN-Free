@@ -5,6 +5,7 @@ import '../helpers/pref.dart';
 import '../models/vpn.dart';
 
 class LocationController extends GetxController {
+  static LocationController get to => Get.find();
   List<Vpn> vpnList = Pref.vpnList;
   final RxBool isLoading = false.obs;
 

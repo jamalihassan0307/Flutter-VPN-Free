@@ -65,7 +65,7 @@ class HomeScreen extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             // Auto-select first VPN when list is loaded
-            // _controller.selectFirstVpn(snapshot.data!);
+            _controller.selectFirstVpn(snapshot.data!);
 
             return Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
               //vpn button
