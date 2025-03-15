@@ -1450,13 +1450,21 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     }
 
     //sending message to main activity
-    private void sendMessage(String duration, String lastPacketReceive, String byteIn, String byteOut) {
-        Intent intent = new Intent("connectionState");
+    public void sendMessage(String status, String duration, String lastPacketReceive, String byteIn) {
+        Intent intent = new Intent("vpn_status");
+        intent.putExtra("status", status);
         intent.putExtra("duration", duration);
-        intent.putExtra("lastPacketReceive", lastPacketReceive);
-        intent.putExtra("byteIn", byteIn);
-        intent.putExtra("byteOut", byteOut);
+        intent.putExtra("last_packet_receive", lastPacketReceive);
+        intent.putExtra("byte_in", byteIn);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        
+        // Update state
+        this.state = status;
+        
+        // Send connection state broadcast
+        Intent stateIntent = new Intent("connectionState");
+        stateIntent.putExtra("state", status);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(stateIntent);
     }
 
     public class LocalBinder extends Binder {
@@ -1511,4 +1519,6 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         // Send connection state to UI
         sendMessage(connected ? "CONNECTED" : "DISCONNECTED");
     }
+
+    public static final String ACTION_VPN_CONNECTED = "vpn_connected";
 }

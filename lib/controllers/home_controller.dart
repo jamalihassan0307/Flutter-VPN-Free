@@ -21,7 +21,9 @@ class HomeController extends GetxController {
     imagePath: '',
     vpnConfigPath: '',
   ).obs;
-  final vpnState = AliVpn.vpnDisconnected.obs;
+  final vpnState = ''.obs;
+  final connectionStatus = ''.obs;
+  final isConnected = false.obs;
 
   void selectFirstVpn(List<Vpn> vpnList) {
     if (vpnList.isNotEmpty && vpn.value.vpnConfigPath.isEmpty) {
@@ -33,28 +35,45 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    vpnState.value = 'disconnected';
 
-    // Listen to VPN status changes
     AliVpn.vpnStageSnapshot().listen((event) {
       print('VPN Status Update: $event');
 
-      // Convert state to uppercase for comparison
-      String state = event.toUpperCase();
+      switch (event.toUpperCase()) {
+       
 
-      if (state.contains("CONNECTED")) {
-        print('VPN Connected Successfully');
-        vpnState.value = AliVpn.vpnConnected;
-        Get.snackbar('Connected', 'VPN connection established', backgroundColor: Colors.green, colorText: Colors.white);
-      } else if (state.contains("DISCONNECTED")) {
-        print('VPN Disconnected');
-        vpnState.value = AliVpn.vpnDisconnected;
-        Get.snackbar('Disconnected', 'VPN connection terminated', backgroundColor: Colors.red, colorText: Colors.white);
-      } else {
-        print('VPN State: $state');
-        vpnState.value = event;
+        case "DISCONNECTED":
+          vpnState.value = 'disconnected';
+          isConnected.value = false;
+          connectionStatus.value = 'VPN Disconnected';
+          Get.snackbar('Disconnected', 'VPN connection terminated',
+              backgroundColor: Colors.red, colorText: Colors.white);
+          break;
+ case "CONNECTED":
+          vpnState.value = 'connected';
+          isConnected.value = true;
+          connectionStatus.value = 'VPN Connected Successfully';
+          Get.snackbar('Connected', 'VPN connection established',
+              backgroundColor: Colors.green, colorText: Colors.white);
+          break;
+        case "CONNECTING":
+          vpnState.value = 'connecting';
+          isConnected.value = false;
+          connectionStatus.value = 'Connecting to VPN...';
+          break;
+
+        case "AUTHENTICATING":
+          vpnState.value = 'authenticating';
+          isConnected.value = false;
+          connectionStatus.value = 'Authenticating...';
+          break;
+
+        default:
+          vpnState.value = event.toLowerCase();
+          connectionStatus.value = 'VPN Status: $event';
       }
-    }, onError: (e) {
-      print('VPN Status Error: $e');
+      update();
     });
   }
 
@@ -70,13 +89,18 @@ class HomeController extends GetxController {
       _selectedVpn =
           VpnConfig(config: await rootBundle.loadString(vpn.value.vpnConfigPath), name: vpn.value.countryLong);
       print('VPN Selected ${vpn.value.vpnConfigPath}');
-
+      print("vpnState.value: ${vpnState.value}");
       if (vpnState.value == AliVpn.vpnDisconnected) {
         print('Starting VPN connection');
         await AliVpn.startVpn(
           _selectedVpn!,
           dns: DnsConfig("23.253.163.53", "198.101.242.72"),
-        );
+        ).then((value) {
+          print('VPN Connected Successfully');
+          vpnState.value = AliVpn.vpnConnected;
+          Get.snackbar('Connected', 'VPN connection established',
+              backgroundColor: Colors.green, colorText: Colors.white);
+        });
       } else {
         print('Stopping VPN connection');
         await AliVpn.stopVpn();
@@ -104,8 +128,8 @@ class HomeController extends GetxController {
   // vpn button text
   String get getButtonText {
     print('Current VPN State: ${vpnState.value}');
-    if (vpnState.value.toUpperCase().contains("CONNECTED,SUCCESS")) return 'Disconnect VPN';
-    if (vpnState.value == AliVpn.vpnDisconnected) return 'Connect VPN';
+    if (vpnState.value.toLowerCase().contains("disconnected")) return 'Connect VPN';
+    if (vpnState.value.toLowerCase().contains("connected")) return 'Disconnect VPN';
     return 'Connecting...';
   }
 

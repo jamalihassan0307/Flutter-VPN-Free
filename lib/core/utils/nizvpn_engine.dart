@@ -7,25 +7,46 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:open_nizvpn/core/models/dnsConfig.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../models/vpnStatus.dart';
 import '../models/vpnConfig.dart';
-import 'package:package_info/package_info.dart';
+// import 'package:package_info/package_info.dart';
 
 class AliVpn {
-  
+  static final _eventChannel = EventChannel(_eventChannelVpnStage);
   static final _statusController = StreamController<String>.broadcast();
-  //   static Stream<VpnStatus?> vpnStatusSnapshot() {
-  //   return _statusController.stream.map((event) => 
-  //     VpnStatus(byteIn: event, byteOut: event)
-  //   );
-  // }
+
+  static Stream<String> vpnStageSnapshot() {
+    print('VPN Stage Snapshot requested');
+    _eventChannel.receiveBroadcastStream().listen((event) {
+      String status = event.toString();
+      print('Native VPN Event: $status');
+
+      // Parse OpenVPN status messages
+      if (status.contains("CONNECTED") && status.contains("SUCCESS")) {
+        _emitStatus("CONNECTED");
+      } else if (status == "DISCONNECTED") {
+        _emitStatus("DISCONNECTED");
+      } else if (status == "CONNECTING") {
+        _emitStatus("CONNECTING");
+      } else if (status == "AUTHENTICATING") {
+        _emitStatus("AUTHENTICATING");
+      } else {
+        _emitStatus(status);
+      }
+    });
+    return _statusController.stream;
+  }
+
+  static void _emitStatus(String status) {
+    print('Emitting VPN status: $status');
+    _statusController.add(status);
+  }
+
   ///Channel to native
   static final String _eventChannelVpnStage = "id.nizwar.nvpn/vpnstage";
   static final String _eventChannelVpnStatus = "id.nizwar.nvpn/vpnstatus";
   static final String _methodChannelVpnControl = "id.nizwar.nvpn/vpncontrol";
-
-  ///Snapshot of VPN Connection Stage
-  static Stream<String> vpnStageSnapshot() => EventChannel(_eventChannelVpnStage).receiveBroadcastStream().cast();
 
   ///Snapshot of VPN Connection Status
   static Stream<VpnStatus?> vpnStatusSnapshot() => EventChannel(_eventChannelVpnStatus)
@@ -34,25 +55,27 @@ class AliVpn {
       .cast();
 
   ///Start VPN easily
-  static Future<void> startVpn(VpnConfig vpnConfig, {DnsConfig? dns, List<String>? bypassPackages}) async {
-    final package = await PackageInfo.fromPlatform();
-    if (bypassPackages == null) {
-      bypassPackages = [package.packageName];
-    } else {
-      bypassPackages.add(package.packageName);
+  static Future<void> startVpn(VpnConfig vpnConfig, {DnsConfig? dns}) async {
+    try {
+      final package = await PackageInfo.fromPlatform();
+
+      return await MethodChannel(_methodChannelVpnControl).invokeMethod(
+        "start",
+        {
+          "config": vpnConfig.config,
+          "country": vpnConfig.name,
+          "username": vpnConfig.username ?? "",
+          "password": vpnConfig.password ?? "",
+          "dns1": dns?.dns1,
+          "dns2": dns?.dns2,
+          "bypass_packages": [package.packageName],
+        },
+      );
+    } catch (e) {
+      print('Error starting VPN: $e');
+      _emitStatus("DISCONNECTED");
+      rethrow;
     }
-    return MethodChannel(_methodChannelVpnControl).invokeMethod(
-      "start",
-      {
-        "config": vpnConfig.config,
-        "country": vpnConfig.name,
-        "username": vpnConfig.username ?? "",
-        "password": vpnConfig.password ?? "",
-        "dns1": dns?.dns1,
-        "dns2": dns?.dns2,
-        "bypass_packages": bypassPackages,
-      },
-    );
   }
 
   ///Stop vpn

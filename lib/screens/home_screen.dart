@@ -193,18 +193,27 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
-          //connection status label
-          Container(
-            margin: EdgeInsets.only(top: mq.height * .015, bottom: mq.height * .02),
-            padding: EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-            decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(15)),
-            child: Text(
-              _controller.vpnState.value == AliVpn.vpnDisconnected
-                  ? 'Not Connected'
-                  : _controller.vpnState.replaceAll('_', ' ').toUpperCase(),
-              style: TextStyle(fontSize: 12.5, color: Colors.white),
-            ),
-          ),
+          // Connection Status
+          Obx(() => Container(
+                margin: EdgeInsets.symmetric(vertical: 10),
+                padding: EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+                decoration: BoxDecoration(
+                    color: _controller.isConnected.value ? Colors.green : Colors.blue,
+                    borderRadius: BorderRadius.circular(15)),
+                child: Column(
+                  children: [
+                    Text(
+                      _controller.vpnState.value.toUpperCase(),
+                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                    if (_controller.connectionStatus.value.isNotEmpty)
+                      Text(
+                        _controller.connectionStatus.value,
+                        style: TextStyle(fontSize: 12, color: Colors.white70),
+                      ),
+                  ],
+                ),
+              )),
 
           //count down timer
           Obx(() => CountDownTimer(startTimer: _controller.vpnState.value == AliVpn.vpnConnected)),

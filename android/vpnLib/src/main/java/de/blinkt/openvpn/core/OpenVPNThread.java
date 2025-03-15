@@ -6,6 +6,8 @@
 package de.blinkt.openvpn.core;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.os.RemoteException;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -124,6 +126,22 @@ public class OpenVPNThread implements Runnable {
             String line;
             while (isProcessAlive.get() && (line = br.readLine()) != null) {
                 Log.d(TAG, "OpenVPN: " + line);
+                
+                try {
+                    // Send status updates to Flutter
+                    if (line.contains("Initialization Sequence Completed")) {
+                        mService.sendMessage("CONNECTED", "SUCCESS", "", "");
+                        mService.protect(mProcess.hashCode());
+                    } else if (line.contains("EXITING")) {
+                        mService.sendMessage("DISCONNECTED", "", "", "");
+                    } else if (line.contains("Connecting")) {
+                        mService.sendMessage("CONNECTING", "", "", "");
+                    } else if (line.contains("AUTH")) {
+                        mService.sendMessage("AUTHENTICATING", "", "", "");
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error sending message", e);
+                }
             }
         } catch (Exception e) {
             if (!Thread.interrupted()) {
