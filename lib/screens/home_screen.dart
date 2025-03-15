@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:ui';
 
 import 'package:get/get.dart';
 import 'package:FastVPN/controllers/location_controller.dart';
@@ -170,23 +171,19 @@ class HomeScreen extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            _controller.getButtonColor.withOpacity(0.9),
-            _controller.getButtonColor,
+            Colors.white.withOpacity(0.1),
+            Colors.white.withOpacity(0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(30),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.2),
+        ),
         boxShadow: [
           BoxShadow(
-            color: _controller.getButtonColor.withOpacity(0.3),
+            color: _controller.getButtonColor.withOpacity(0.2),
             blurRadius: 30,
             offset: Offset(0, 15),
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            color: _controller.getButtonColor.withOpacity(0.2),
-            blurRadius: 60,
-            offset: Offset(0, 30),
-            spreadRadius: -10,
           ),
         ],
       ),
@@ -233,41 +230,48 @@ class HomeScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isLight ? Colors.white : Colors.white.withOpacity(0.05),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withOpacity(0.1),
+            Colors.white.withOpacity(0.05),
+          ],
+        ),
         borderRadius: BorderRadius.circular(24),
-        boxShadow: isLight
-            ? [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: Offset(0, 5),
-                ),
-              ]
-            : null,
+        border: Border.all(
+          color: Colors.white.withOpacity(0.2),
+        ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildInfoColumn(
-            context,
-            icon: _controller.vpn.value.countryLong.isEmpty
-                ? Icon(Icons.vpn_lock_rounded, size: 30, color: Colors.white)
-                : null,
-            image: _controller.vpn.value.countryLong.isEmpty
-                ? null
-                : 'assets/flags/${_controller.vpn.value.countryShort.toLowerCase()}.png',
-            title: _controller.vpn.value.countryLong.isEmpty ? 'Country' : _controller.vpn.value.countryLong,
-            subtitle: 'FREE',
-            color: Theme.of(context).primaryColor,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildInfoColumn(
+                context,
+                icon: _controller.vpn.value.countryLong.isEmpty
+                    ? Icon(Icons.vpn_lock_rounded, size: 30, color: Colors.white)
+                    : null,
+                image: _controller.vpn.value.countryLong.isEmpty
+                    ? null
+                    : 'assets/flags/${_controller.vpn.value.countryShort.toLowerCase()}.png',
+                title: _controller.vpn.value.countryLong.isEmpty ? 'Country' : _controller.vpn.value.countryLong,
+                subtitle: 'FREE',
+                color: Theme.of(context).primaryColor,
+              ),
+              _buildInfoColumn(
+                context,
+                icon: Icon(Icons.equalizer_rounded, size: 30, color: Colors.white),
+                title: _controller.vpn.value.countryLong.isEmpty ? '100 ms' : '${_controller.vpn.value.ping} ms',
+                subtitle: 'PING',
+                color: Colors.orange,
+              ),
+            ],
           ),
-          _buildInfoColumn(
-            context,
-            icon: Icon(Icons.equalizer_rounded, size: 30, color: Colors.white),
-            title: _controller.vpn.value.countryLong.isEmpty ? '100 ms' : '${_controller.vpn.value.ping} ms',
-            subtitle: 'PING',
-            color: Colors.orange,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -326,45 +330,61 @@ class HomeScreen extends StatelessWidget {
         return Container(
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.1),
+                Colors.white.withOpacity(0.05),
+              ],
+            ),
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.2),
+            ),
             boxShadow: [
               BoxShadow(
-                color: Theme.of(context).shadowColor.withOpacity(0.1),
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
                 blurRadius: 20,
                 offset: Offset(0, 10),
               ),
             ],
           ),
-          child: Column(
-            children: [
-              Text(
-                'Network Statistics',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.titleLarge?.color,
-                ),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Column(
                 children: [
-                  _buildAnimatedStatItem(
-                    icon: Icons.arrow_downward_rounded,
-                    value: '${snapshot.data?.byteIn ?? '0 kbps'}',
-                    label: 'DOWNLOAD',
-                    color: Colors.green,
+                  Text(
+                    'Network Statistics',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
                   ),
-                  _buildAnimatedStatItem(
-                    icon: Icons.arrow_upward_rounded,
-                    value: '${snapshot.data?.byteOut ?? '0 kbps'}',
-                    label: 'UPLOAD',
-                    color: Colors.blue,
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildAnimatedStatItem(
+                        icon: Icons.arrow_downward_rounded,
+                        value: '${snapshot.data?.byteIn ?? '0 kbps'}',
+                        label: 'DOWNLOAD',
+                        color: Colors.green,
+                      ),
+                      _buildAnimatedStatItem(
+                        icon: Icons.arrow_upward_rounded,
+                        value: '${snapshot.data?.byteOut ?? '0 kbps'}',
+                        label: 'UPLOAD',
+                        color: Colors.blue,
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         );
       },
@@ -377,44 +397,50 @@ class HomeScreen extends StatelessWidget {
     required String label,
     required Color color,
   }) {
-    return TweenAnimationBuilder(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 500),
-      builder: (context, double value, child) {
-        return Opacity(
-          opacity: value,
-          child: Transform.translate(
-            offset: Offset(0, 20 * (1 - value)),
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, color: color, size: 30),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  value.toString(),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+    return Container(
+      padding: EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withOpacity(0.2),
+            color.withOpacity(0.1),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: Colors.white, size: 24),
+          ),
+          SizedBox(height: 10),
+          Text(
+            value,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
           ),
-        );
-      },
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.7),
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -436,7 +462,15 @@ class HomeScreen extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () => Get.to(() => LocationScreen()),
+          onTap: () async {
+            final result = await Get.to(() => LocationScreen());
+            if (result == true) {
+              // Location was selected, trigger connection if needed
+              if (_controller.vpnState.value != AliVpn.vpnConnected) {
+                _controller.connectToVpn();
+              }
+            }
+          },
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Row(
@@ -489,87 +523,114 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildConnectButton(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: () => _controller.connectToVpn(),
       child: Container(
         width: 200,
         height: 200,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Animated background glow
-            AnimatedBuilder(
-              animation: AnimationController(
-                duration: Duration(seconds: 2),
-                vsync: Navigator.of(context),
-              )..repeat(),
-              builder: (context, child) {
-                return Container(
-                  width: 200,
-                  height: 200,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white.withOpacity(0.15),
+              Colors.white.withOpacity(0.05),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(100),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.2),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: _controller.getButtonColor.withOpacity(0.2),
+              blurRadius: 20,
+              spreadRadius: 5,
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(100),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Animated background glow
+                AnimatedBuilder(
+                  animation: AnimationController(
+                    duration: Duration(seconds: 2),
+                    vsync: Navigator.of(context),
+                  )..repeat(),
+                  builder: (context, child) {
+                    return Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            _controller.getButtonColor.withOpacity(0.6),
+                            _controller.getButtonColor.withOpacity(0.0),
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _controller.getButtonColor.withOpacity(0.5),
+                            blurRadius: 30,
+                            spreadRadius: 10,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+
+                // Multiple rotating gradient rings
+                ..._buildRotatingRings(),
+
+                // Main button container
+                Container(
+                  width: 160,
+                  height: 160,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: RadialGradient(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                       colors: [
-                        _controller.getButtonColor.withOpacity(0.6),
-                        _controller.getButtonColor.withOpacity(0.0),
+                        _controller.getButtonColor.withOpacity(0.9),
+                        _controller.getButtonColor,
                       ],
                     ),
                     boxShadow: [
                       BoxShadow(
                         color: _controller.getButtonColor.withOpacity(0.5),
-                        blurRadius: 30,
-                        spreadRadius: 10,
+                        blurRadius: 20,
+                        spreadRadius: 5,
                       ),
                     ],
                   ),
-                );
-              },
-            ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Animated progress circles
+                      ..._buildPulsingCircles(),
 
-            // Multiple rotating gradient rings
-            ..._buildRotatingRings(),
-
-            // Main button container
-            Container(
-              width: 160,
-              height: 160,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    _controller.getButtonColor.withOpacity(0.9),
-                    _controller.getButtonColor,
-                  ],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: _controller.getButtonColor.withOpacity(0.5),
-                    blurRadius: 20,
-                    spreadRadius: 5,
+                      // Center button with enhanced animation
+                      _buildAnimatedCenterButton(),
+                    ],
                   ),
-                ],
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Animated progress circles
-                  ..._buildPulsingCircles(),
+                ),
 
-                  // Center button with enhanced animation
-                  _buildAnimatedCenterButton(),
-                ],
-              ),
+                // Dynamic ripple effects
+                if (_controller.vpnState.value == "connecting") ..._buildEnhancedRipples(),
+
+                // Status indicator ring
+                _buildStatusRing(),
+              ],
             ),
-
-            // Dynamic ripple effects
-            if (_controller.vpnState.value == "connecting") ..._buildEnhancedRipples(),
-
-            // Status indicator ring
-            _buildStatusRing(),
-          ],
+          ),
         ),
       ),
     );

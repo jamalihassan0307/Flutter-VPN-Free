@@ -172,11 +172,16 @@ class VpnCard extends StatelessWidget {
     Pref.vpn = vpn;
     Get.back();
     MyDialogs.info(msg: 'Connecting VPN Location...');
+    
     if (controller.vpnState.value == AliVpn.vpnConnected) {
       AliVpn.stopVpn();
-      Future.delayed(Duration(seconds: 2), () => controller.connectToVpn());
+      Future.delayed(Duration(seconds: 2), () {
+        controller.connectToVpn();
+        Get.back(result: true);
+      });
     } else {
       controller.connectToVpn();
+      Get.back(result: true);
     }
   }
 
