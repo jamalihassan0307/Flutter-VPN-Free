@@ -108,30 +108,33 @@ class HomeScreen extends StatelessWidget {
                   initialData: VpnStatus(),
                   stream: AliVpn.vpnStatusSnapshot()
                       .map((event) => event != null ? VpnStatus.fromJson(event as Map<String, dynamic>) : null),
-                  builder: (context, snapshot) => Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          //download
-                          HomeCard(
-                              title: '${snapshot.data?.byteIn ?? '0 kbps'}',
-                              subtitle: 'DOWNLOAD',
-                              icon: CircleAvatar(
-                                radius: 30,
-                                backgroundColor: Colors.lightGreen,
-                                child: Icon(Icons.arrow_downward_rounded, size: 30, color: Colors.white),
-                              )),
+                  builder: (context, snapshot) {
+                    print('VPN Status Data: ${snapshot.data?.toJson()}');
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        //download
+                        HomeCard(
+                            title: '${snapshot.data?.byteIn ?? '0 kbps'}',
+                            subtitle: 'DOWNLOAD',
+                            icon: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.lightGreen,
+                              child: Icon(Icons.arrow_downward_rounded, size: 30, color: Colors.white),
+                            )),
 
-                          //upload
-                          HomeCard(
-                              title: '${snapshot.data?.byteOut ?? '0 kbps'}',
-                              subtitle: 'UPLOAD',
-                              icon: CircleAvatar(
-                                radius: 30,
-                                backgroundColor: Colors.blue,
-                                child: Icon(Icons.arrow_upward_rounded, size: 30, color: Colors.white),
-                              )),
-                        ],
-                      ))
+                        //upload
+                        HomeCard(
+                            title: '${snapshot.data?.byteOut ?? '0 kbps'}',
+                            subtitle: 'UPLOAD',
+                            icon: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.blue,
+                              child: Icon(Icons.arrow_upward_rounded, size: 30, color: Colors.white),
+                            )),
+                      ],
+                    );
+                  })
             ]);
           }
           return Center(child: CircularProgressIndicator());

@@ -12,7 +12,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   //enter full-screen
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
   await Pref.initializeHive();
 
@@ -22,9 +22,9 @@ Future<void> main() async {
   // await AdHelper.initAds();
 
   //for setting orientation to portrait only
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((v) {
-    runApp(const MyApp());
-  });
+  // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((v) {
+  runApp(const MyApp());
+  // });
 }
 
 class MyApp extends StatelessWidget {

@@ -9,7 +9,6 @@ import 'package:open_nizvpn/core/utils/nizvpn_engine.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/vpn.dart';
-import '../services/vpn_engine.dart';
 
 class HomeController extends GetxController {
   final vpn = Vpn(
@@ -22,7 +21,7 @@ class HomeController extends GetxController {
     imagePath: '',
     vpnConfigPath: '',
   ).obs;
-  final vpnState = VpnEngine.vpnDisconnected.obs;
+  final vpnState = AliVpn.vpnDisconnected.obs;
 
   void selectFirstVpn(List<Vpn> vpnList) {
     if (vpnList.isNotEmpty && vpn.value.vpnConfigPath.isEmpty) {
@@ -31,56 +30,70 @@ class HomeController extends GetxController {
     }
   }
 
-  void connectToVpn() async {
+  @override
+  void onInit() {
+    super.onInit();
+
+    // Listen to VPN status changes
+    AliVpn.vpnStageSnapshot().listen((event) {
+      print('VPN Status Update: $event');
+
+      // Convert state to uppercase for comparison
+      String state = event.toUpperCase();
+
+      if (state.contains("CONNECTED")) {
+        print('VPN Connected Successfully');
+        vpnState.value = AliVpn.vpnConnected;
+        Get.snackbar('Connected', 'VPN connection established', backgroundColor: Colors.green, colorText: Colors.white);
+      } else if (state.contains("DISCONNECTED")) {
+        print('VPN Disconnected');
+        vpnState.value = AliVpn.vpnDisconnected;
+        Get.snackbar('Disconnected', 'VPN connection terminated', backgroundColor: Colors.red, colorText: Colors.white);
+      } else {
+        print('VPN State: $state');
+        vpnState.value = event;
+      }
+    }, onError: (e) {
+      print('VPN Status Error: $e');
+    });
+  }
+
+  Future<void> connectToVpn() async {
     print('Start connectToVpn');
     if (vpn.value.vpnConfigPath.isEmpty) {
       print('No VPN Selected');
       Get.snackbar('Selection Required', 'Please select a VPN server first');
       return;
     }
-    print('VPN Selected ${vpn.value.vpnConfigPath}');
-    try {
-      if (_selectedVpn == null) return;
 
-      if (vpnState.value == VpnEngine.vpnDisconnected) {
-        ///Start if stage is disconnected
-        AliVpn.startVpn(
+    try {
+      _selectedVpn =
+          VpnConfig(config: await rootBundle.loadString(vpn.value.vpnConfigPath), name: vpn.value.countryLong);
+      print('VPN Selected ${vpn.value.vpnConfigPath}');
+
+      if (vpnState.value == AliVpn.vpnDisconnected) {
+        print('Starting VPN connection');
+        await AliVpn.startVpn(
           _selectedVpn!,
           dns: DnsConfig("23.253.163.53", "198.101.242.72"),
         );
-        Get.snackbar('Connection Successful', 'Connected to ${vpn.value.countryLong}',
-            backgroundColor: Colors.green, colorText: Colors.white);
       } else {
-        Get.snackbar('Connection Stopped', 'Disconnected from ${vpn.value.countryLong}',
-            backgroundColor: Colors.red, colorText: Colors.white);
+        print('Stopping VPN connection');
+        await AliVpn.stopVpn();
       }
-
-      ///Stop if stage is "not" disconnected
-      AliVpn.stopVpn();
     } catch (e) {
+      print('VPN Error: $e');
       Get.snackbar('Connection Failed', 'Error: ${e.toString()}');
     }
-
-    // if (vpnState.value == VpnEngine.vpnDisconnected) {
-    //   try {
-    //     await VpnService.startVpn(vpn.value.config);
-    //     Get.snackbar('Connection Successful', 'Connected to ${vpn.value.countryLong}',
-    //         backgroundColor: Colors.green, colorText: Colors.white);
-    //   } catch (e) {
-    //     Get.snackbar('Connection Failed', 'Error: ${e.toString()}');
-    //   }
-    // } else {
-    //   await VpnService.stopVpn();
-    // }
   }
 
   // vpn buttons color
   Color get getButtonColor {
     switch (vpnState.value) {
-      case VpnEngine.vpnDisconnected:
+      case AliVpn.vpnDisconnected:
         return Colors.blue;
 
-      case VpnEngine.vpnConnected:
+      case AliVpn.vpnConnected:
         return Colors.green;
 
       default:
@@ -90,41 +103,14 @@ class HomeController extends GetxController {
 
   // vpn button text
   String get getButtonText {
-    if (vpnState.value == VpnEngine.vpnDisconnected) return 'Connect VPN';
-    if (vpnState.value == VpnEngine.vpnConnected) return 'Disconnect VPN';
+    print('Current VPN State: ${vpnState.value}');
+    if (vpnState.value.toUpperCase().contains("CONNECTED,SUCCESS")) return 'Disconnect VPN';
+    if (vpnState.value == AliVpn.vpnDisconnected) return 'Connect VPN';
     return 'Connecting...';
   }
 
   VpnConfig? _selectedVpn;
   List<VpnConfig> _listVpn = [];
-  Future<void> connectClick() async {
-    ///Stop right here if user not select a vpn
-    if (_selectedVpn == null) {
-      print('No VPN Selected');
-      Get.snackbar('Selection Required', 'Please select a VPN server first');
-      return;
-    } else {
-      _selectedVpn =
-          VpnConfig(config: await rootBundle.loadString(vpn.value.vpnConfigPath), name: vpn.value.countryLong);
-      print('VPN Selected ${_selectedVpn!.name}');
-    }
-    ;
-
-    if (vpnState.value == VpnEngine.vpnDisconnected) {
-      print('Start VPN and stage is ${vpnState.value}');
-
-      ///Start if stage is disconnected
-      AliVpn.startVpn(
-        _selectedVpn!,
-        dns: DnsConfig("23.253.163.53", "198.101.242.72"),
-      );
-    } else {
-      print('Stop VPN and stage is ${vpnState.value}');
-
-      ///Stop if stage is "not" disconnected
-      AliVpn.stopVpn();
-    }
-  }
 
   void initVpn() async {
     for (var i in LocationController.to.vpnList) {

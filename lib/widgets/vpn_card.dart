@@ -10,7 +10,6 @@ import '../controllers/home_controller.dart';
 import '../helpers/pref.dart';
 import '../main.dart';
 import '../models/vpn.dart';
-import '../services/vpn_engine.dart';
 
 class VpnCard extends StatelessWidget {
   final Vpn vpn;
