@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
               left: mq.width * .3,
               top: mq.height * .2,
               width: mq.width * .4,
-              child: Image.asset('assets/images/logo.png')),
+              child: Image.asset('assets/images/logo.jpeg')),
 
           //label
           Positioned(

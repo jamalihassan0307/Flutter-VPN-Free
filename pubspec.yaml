@@ -23,7 +23,7 @@ dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   # ios: true
-  image_path: "assets/images/logo.png"
+  image_path: "assets/images/logo.jpeg"
   min_sdk_android: 21
   background_color: "#FFFFFF"
 
