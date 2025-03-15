@@ -5,6 +5,7 @@ import 'package:FastVPN/controllers/home_controller.dart';
 import 'package:FastVPN/controllers/location_controller.dart';
 import 'package:animations/animations.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:lottie/lottie.dart';
 
 // import '../helpers/ad_helper.dart';
 import '../main.dart';
@@ -21,7 +22,8 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _rotateAnimation;
 
   @override
   void initState() {
@@ -33,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     // Setup animations
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 3),
       vsync: this,
     );
 
@@ -42,31 +44,30 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeIn,
+      curve: Interval(0.0, 0.5, curve: Curves.easeIn),
     ));
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.5),
-      end: Offset.zero,
+    _scaleAnimation = Tween<double>(
+      begin: 0.5,
+      end: 1.0,
     ).animate(CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOutBack,
+      curve: Interval(0.2, 0.7, curve: Curves.elasticOut),
+    ));
+
+    _rotateAnimation = Tween<double>(
+      begin: 0,
+      end: 2 * 3.14159,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Interval(0.4, 0.8, curve: Curves.easeInOut),
     ));
 
     _controller.forward();
 
-    Future.delayed(const Duration(milliseconds: 2500), () {
+    Future.delayed(const Duration(seconds: 3), () {
       Get.off(
-        () => OpenContainer(
-          transitionDuration: Duration(milliseconds: 1000),
-          openBuilder: (context, _) => HomeScreen(),
-          closedBuilder: (context, VoidCallback openContainer) => Container(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            child: Center(
-              child: Image.asset('assets/images/logo.jpeg'),
-            ),
-          ),
-        ),
+        () => HomeScreen(),
       );
     });
   }
@@ -85,58 +86,168 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: [
-              Theme.of(context).primaryColor.withOpacity(0.8),
-              Theme.of(context).scaffoldBackgroundColor,
+              Color(0xFF2A2D3E),
+              Color(0xFF1F1F1F),
             ],
           ),
         ),
         child: Stack(
           children: [
-            // Animated Logo
-            Positioned(
-              left: mq.width * .3,
-              top: mq.height * .2,
-              width: mq.width * .4,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Hero(
-                    tag: 'logo',
-                    child: Image.asset('assets/images/logo.jpeg'),
-                  ),
+            // Background animated circles
+            ...List.generate(20, (index) {
+              return Positioned(
+                left: (index * 20.0) % mq.width,
+                top: (index * 30.0) % mq.height,
+                child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _scaleAnimation.value * 0.3,
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.05),
+                        ),
+                      ),
+                    );
+                  },
                 ),
+              );
+            }),
+
+            // Centered Content
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Animated Logo
+                  AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _scaleAnimation.value,
+                        child: Transform.rotate(
+                          angle: _rotateAnimation.value,
+                          child: FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: Hero(
+                              tag: 'logo',
+                              child: Container(
+                                width: mq.width * 0.5,
+                                height: mq.width * 0.5,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.blue.withOpacity(0.3),
+                                      blurRadius: 20,
+                                      spreadRadius: 5,
+                                    ),
+                                  ],
+                                ),
+                                child: ClipOval(
+                                  child: Image.asset(
+                                    'assets/images/logo-removebg.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                  SizedBox(height: 50),
+
+                  // Animated Text
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: DefaultTextStyle(
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 2,
+                      ),
+                      child: AnimatedTextKit(
+                        animatedTexts: [
+                          TypewriterAnimatedText(
+                            'FAST VPN',
+                            speed: Duration(milliseconds: 200),
+                          ),
+                        ],
+                        isRepeatingAnimation: false,
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 20),
+
+                  // Subtitle
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: Text(
+                      'Secure • Fast • Reliable',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 40),
+
+                  // Loading indicator
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                        strokeWidth: 3,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
-            // Animated Text
+            // Bottom text
             Positioned(
-              bottom: mq.height * .15,
-              width: mq.width,
+              bottom: 30,
+              left: 0,
+              right: 0,
               child: FadeTransition(
                 opacity: _fadeAnimation,
-                child: DefaultTextStyle(
-                  style: TextStyle(
-                    color: Theme.of(context).lightText,
-                    fontSize: 16,
-                    letterSpacing: 1,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  child: AnimatedTextKit(
-                    animatedTexts: [
-                      FadeAnimatedText(
-                        'MADE IN PAKISTAN',
-                        duration: Duration(seconds: 2),
-                      ),
-                      FadeAnimatedText(
-                        'WITH ❤️ BY ALI',
-                        duration: Duration(seconds: 2),
-                      ),
-                    ],
-                    repeatForever: true,
+                child: Center(
+                  child: DefaultTextStyle(
+                    style: TextStyle(
+                      color: Colors.white60,
+                      fontSize: 14,
+                      letterSpacing: 1,
+                    ),
+                    child: AnimatedTextKit(
+                      animatedTexts: [
+                        FadeAnimatedText(
+                          'MADE IN PAKISTAN',
+                          duration: Duration(seconds: 2),
+                        ),
+                        FadeAnimatedText(
+                          'WITH ❤️ BY ALI',
+                          duration: Duration(seconds: 2),
+                        ),
+                      ],
+                      repeatForever: true,
+                    ),
                   ),
                 ),
               ),
