@@ -8,7 +8,7 @@
     <application
         android:name="${applicationName}"
         android:label="Open NIZVPN"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/launcher_icon"
         tools:ignore="AllowBackup">
         <activity
             android:name=".MainActivity"
