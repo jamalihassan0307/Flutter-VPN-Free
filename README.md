@@ -99,15 +99,41 @@ A beautifully designed Flutter VPN application with an elegant UI, smooth animat
 
 ## 🌍 Available Server Locations
 
-- 🇺🇸 United States
-- 🇯🇵 Japan
-- 🇰🇷 South Korea
-- 🇮🇩 Indonesia
-- 🇪🇨 Ecuador
-- 🇷🇴 Romania
-- 🇷🇺 Russia
-- 🇹🇼 Taiwan
-- 🇻🇳 Vietnam
+<table>
+  <tr>
+    <td>
+      <img src="assets/flags/us.png" width="20" style="vertical-align: middle"> United States
+    </td>
+    <td>
+      <img src="assets/flags/japan.png" width="20" style="vertical-align: middle"> Japan
+    </td>
+    <td>
+      <img src="assets/flags/kr.png" width="20" style="vertical-align: middle"> South Korea
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="assets/flags/id.png" width="20" style="vertical-align: middle"> Indonesia
+    </td>
+    <td>
+      <img src="assets/flags/ec.png" width="20" style="vertical-align: middle"> Ecuador
+    </td>
+    <td>
+      <img src="assets/flags/ro.png" width="20" style="vertical-align: middle"> Romania
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="assets/flags/ru.png" width="20" style="vertical-align: middle"> Russia
+    </td>
+    <td>
+      <img src="assets/flags/tw.png" width="20" style="vertical-align: middle"> Taiwan
+    </td>
+    <td>
+      <img src="assets/flags/vn.png" width="20" style="vertical-align: middle"> Vietnam
+    </td>
+  </tr>
+</table>
 
 ## 📁 Project Structure
 
