@@ -87,8 +87,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF2A2D3E),
-              Color(0xFF1F1F1F),
+              Colors.blue.shade50, // Light blue background
+              Colors.white,
             ],
           ),
         ),
@@ -109,7 +109,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         height: 100,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.blue.withOpacity(0.1),
                         ),
                       ),
                     );
@@ -142,7 +142,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.blue.withOpacity(0.3),
+                                      color: Colors.blue.withOpacity(0.2),
                                       blurRadius: 20,
                                       spreadRadius: 5,
                                     ),
@@ -171,7 +171,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Colors.blue.shade700, // Darker blue for text
                         letterSpacing: 2,
                       ),
                       child: AnimatedTextKit(
@@ -194,7 +194,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     child: Text(
                       'Secure • Fast • Reliable',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: Colors.blue.shade600, // Slightly lighter blue
                         fontSize: 16,
                         letterSpacing: 1.5,
                       ),
@@ -229,7 +229,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 child: Center(
                   child: DefaultTextStyle(
                     style: TextStyle(
-                      color: Colors.white60,
+                      color: Colors.blue.shade600,
                       fontSize: 14,
                       letterSpacing: 1,
                     ),
