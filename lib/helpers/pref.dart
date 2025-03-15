@@ -31,4 +31,8 @@ class Pref {
   }
 
   static set vpnList(List<Vpn> v) => _box.put('vpnList', jsonEncode(v));
+
+  // Add this field
+  static bool get isFirstTime => _box.get('isFirstTime', defaultValue: true);
+  static set isFirstTime(bool v) => _box.put('isFirstTime', v);
 }

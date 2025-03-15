@@ -11,6 +11,8 @@ import 'package:lottie/lottie.dart';
 import '../main.dart';
 import 'package:get/get.dart';
 import 'home_screen.dart';
+import 'walkthrough_screen.dart';
+import '../helpers/pref.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen();
@@ -65,11 +67,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _controller.forward();
 
-    Future.delayed(const Duration(seconds: 3), () {
-      Get.off(
-        () => HomeScreen(),
-      );
-    });
+    _navigateToNextScreen();
   }
 
   @override
@@ -256,5 +254,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         ),
       ),
     );
+  }
+
+  Future<void> _navigateToNextScreen() async {
+    await Future.delayed(Duration(seconds: 2));
+
+    // if (Pref.isFirstTime) {
+    Get.off(() => WalkthroughScreen());
+    // } else {
+    //   Get.off(() => HomeScreen());
+    // }
   }
 }
