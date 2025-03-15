@@ -46,7 +46,7 @@ class HomeScreen extends StatelessWidget {
               padding: EdgeInsets.only(right: 8),
               onPressed: () => Get.to(() => NetworkTestScreen()),
               icon: Icon(
-                CupertinoIcons.info,
+                Icons.info,
                 size: 27,
               )),
         ],
@@ -253,7 +253,7 @@ class HomeScreen extends StatelessWidget {
               child: Row(
                 children: [
                   //icon
-                  Icon(CupertinoIcons.globe, color: Colors.white, size: 28),
+                  Icon(Icons.public, color: Colors.white, size: 28),
 
                   //for adding some space
                   SizedBox(width: 10),
