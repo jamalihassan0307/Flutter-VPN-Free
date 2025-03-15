@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/home_controller.dart';
-// import '../helpers/ad_helper.dart';
-import '../helpers/config.dart';
 import '../helpers/pref.dart';
 import '../main.dart';
 
@@ -13,7 +11,6 @@ import '../models/vpn_status.dart';
 import '../services/vpn_engine.dart';
 import '../widgets/count_down_timer.dart';
 import '../widgets/home_card.dart';
-import '../widgets/watch_ad_dialog.dart';
 import 'location_screen.dart';
 import 'network_test_screen.dart';
 import '../models/vpn.dart';
@@ -38,22 +35,9 @@ class HomeScreen extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () {
-                //ad dialog
-
-                if (Config.hideAds) {
-                  Get.changeThemeMode(Pref.isDarkMode ? ThemeMode.light : ThemeMode.dark);
-                  Pref.isDarkMode = !Pref.isDarkMode;
-                  return;
-                }
-
-                Get.dialog(WatchAdDialog(onComplete: () {
-                  //watch ad to gain reward
-                  // AdHelper.showRewardedAd(onComplete: () {
-                  //   Get.changeThemeMode(
-                  //       Pref.isDarkMode ? ThemeMode.light : ThemeMode.dark);
-                  //   Pref.isDarkMode = !Pref.isDarkMode;
-                  // });
-                }));
+                Get.changeThemeMode(Pref.isDarkMode ? ThemeMode.light : ThemeMode.dark);
+                Pref.isDarkMode = !Pref.isDarkMode;
+                return;
               },
               icon: Icon(
                 Icons.brightness_medium,

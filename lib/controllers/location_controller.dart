@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../apis/apis.dart';
+// import '../apis/apis.dart';
 import '../helpers/pref.dart';
 import '../models/vpn.dart';
 
@@ -12,7 +12,7 @@ class LocationController extends GetxController {
   Future<void> getVpnData() async {
     isLoading.value = true;
     vpnList.clear();
-    vpnList = await APIs.getVPNServers();
+    // vpnList = await APIs.getVPNServers();
     isLoading.value = false;
   }
 }

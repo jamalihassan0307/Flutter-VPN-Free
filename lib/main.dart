@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 import 'services/vpn_engine.dart';
 import 'screens/splash_screen.dart';
 
-// import 'helpers/ad_helper.dart';
-import 'helpers/config.dart';
 import 'helpers/pref.dart';
 
 //global object for accessing dev ice screen size
@@ -18,14 +14,6 @@ Future<void> main() async {
 
   //enter full-screen
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-
-  //firebase initialization
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  //initializing remote config
-  await Config.initConfig();
 
   await Pref.initializeHive();
 
