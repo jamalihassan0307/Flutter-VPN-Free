@@ -60,10 +60,32 @@ class _CountDownTimerState extends State<CountDownTimer> {
   @override
   Widget build(BuildContext context) {
     String twoDigit(int n) => n.toString().padLeft(2, '0');
+    final hours = twoDigit(_duration.inHours);
     final minutes = twoDigit(_duration.inMinutes.remainder(60));
     final seconds = twoDigit(_duration.inSeconds.remainder(60));
-    final hours = twoDigit(_duration.inHours.remainder(60));
 
-    return Text('$hours:$minutes:$seconds', style: TextStyle(fontSize: 22));
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.timer, color: Colors.white, size: 18),
+          SizedBox(width: 8),
+          Text(
+            '$hours:$minutes:$seconds',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 2,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

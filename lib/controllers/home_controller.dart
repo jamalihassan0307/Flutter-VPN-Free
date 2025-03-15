@@ -27,7 +27,7 @@ class HomeController extends GetxController {
 
   void selectFirstVpn(List<Vpn> vpnList) {
     if (vpnList.isNotEmpty && vpn.value.vpnConfigPath.isEmpty) {
-      vpn.value = vpnList[4];
+      vpn.value = vpnList[0];
       print('Auto-selected first VPN: ${vpn.value.hostname}');
     }
   }

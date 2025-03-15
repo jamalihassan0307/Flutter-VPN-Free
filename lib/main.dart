@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'screens/splash_screen.dart';
 
 import 'helpers/pref.dart';
+import 'theme/app_theme.dart';
 
 //global object for accessing dev ice screen size
 late Size mq;
@@ -23,34 +24,24 @@ Future<void> main() async {
 
   //for setting orientation to portrait only
   // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((v) {
-  runApp(const MyApp());
+  runApp(MyApp());
   // });
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp();
-
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'OpenVpn Demo',
-      home: const SplashScreen(),
-
-      //theme
-      theme: ThemeData(appBarTheme: const AppBarTheme(centerTitle: true, elevation: 3)),
-
+      title: 'Fast VPN',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
       themeMode: Pref.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-
-      //dark theme
-      darkTheme:
-          ThemeData(brightness: Brightness.dark, appBarTheme: const AppBarTheme(centerTitle: true, elevation: 3)),
-
-      debugShowCheckedModeBanner: false,
+      home: SplashScreen(),
     );
   }
 }
 
-extension AppTheme on ThemeData {
-  Color get lightText => Pref.isDarkMode ? Colors.white70 : Colors.black54;
-  Color get bottomNav => Pref.isDarkMode ? Colors.white12 : Colors.blue;
-}
+// extension AppTheme on ThemeData {
+//   Color get lightText => Pref.isDarkMode ? Colors.white70 : Colors.black54;
+//   Color get bottomNav => Pref.isDarkMode ? Colors.white12 : Colors.blue;
+// }

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:FastVPN/theme/app_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,65 +20,164 @@ class VpnCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
+    final isSelected = controller.vpn.value.countryLong == vpn.countryLong;
 
-    return Card(
-        elevation: 5,
-        margin: EdgeInsets.symmetric(vertical: mq.height * .01),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+      decoration: BoxDecoration(
+        color: isSelected ? Theme.of(context).primaryColor.withOpacity(0.1) : Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isSelected ? Theme.of(context).primaryColor : Colors.transparent,
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).shadowColor.withOpacity(0.1),
+            blurRadius: 20,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            controller.vpn.value = vpn;
-            Pref.vpn = vpn;
-            Get.back();
-
-            MyDialogs.info(msg: 'Connecting VPN Location...');
-
-            if (controller.vpnState.value == AliVpn.vpnConnected) {
-              AliVpn.stopVpn();
-              Future.delayed(Duration(seconds: 2), () => controller.connectToVpn());
-            } else {
-              controller.connectToVpn();
-            }
-          },
-          borderRadius: BorderRadius.circular(15),
-          child: ListTile(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-
-            //flag
-            leading: Container(
-              padding: EdgeInsets.all(.5),
-              decoration:
-                  BoxDecoration(border: Border.all(color: Colors.black12), borderRadius: BorderRadius.circular(5)),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: Image.asset(vpn.imagePath, height: 40, width: mq.width * .15, fit: BoxFit.cover),
-              ),
-            ),
-
-            //title
-            title: Text(vpn.countryLong),
-
-            //subtitle
-            subtitle: Row(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () => _handleVpnSelection(controller),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Row(
               children: [
-                Icon(Icons.speed_rounded, color: Colors.blue, size: 20),
-                SizedBox(width: 4),
-                Text(_formatBytes(vpn.speed, 1), style: TextStyle(fontSize: 13))
-              ],
-            ),
-
-            //trailing
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(vpn.countryLong.toString(),
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Theme.of(context).lightText)),
-                SizedBox(width: 4),
-                Icon(CupertinoIcons.person_3, color: Colors.blue),
+                _buildFlagContainer(),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        vpn.countryLong,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.titleLarge?.color,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      _buildSpeedInfo(context),
+                    ],
+                  ),
+                ),
+                _buildSignalStrength(context),
               ],
             ),
           ),
-        ));
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFlagContainer() {
+    return Container(
+      width: 60,
+      height: 45,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.asset(
+          vpn.imagePath,
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpeedInfo(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.blue.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.speed_rounded,
+                color: Colors.blue,
+                size: 14,
+              ),
+              SizedBox(width: 4),
+              Text(
+                _formatBytes(vpn.speed, 1),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSignalStrength(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor.withOpacity(0.1),
+        shape: BoxShape.circle,
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(
+            CupertinoIcons.wifi,
+            color: Theme.of(context).primaryColor,
+            size: 20,
+          ),
+          if (int.parse(vpn.ping) < 100)
+            Positioned(
+              right: 0,
+              top: 0,
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _handleVpnSelection(HomeController controller) {
+    controller.vpn.value = vpn;
+    Pref.vpn = vpn;
+    Get.back();
+    MyDialogs.info(msg: 'Connecting VPN Location...');
+    if (controller.vpnState.value == AliVpn.vpnConnected) {
+      AliVpn.stopVpn();
+      Future.delayed(Duration(seconds: 2), () => controller.connectToVpn());
+    } else {
+      controller.connectToVpn();
+    }
   }
 
   String _formatBytes(String speed, int decimals) {
