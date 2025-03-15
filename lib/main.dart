@@ -23,15 +23,16 @@ Future<void> main() async {
   // await AdHelper.initAds();
 
   //for setting orientation to portrait only
-  // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((v) {
-  runApp(MyApp());
-  // });
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((v) {
+    runApp(MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Fast VPN',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
