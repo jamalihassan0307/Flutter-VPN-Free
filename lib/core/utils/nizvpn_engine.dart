@@ -3,6 +3,7 @@
  * Distributed under the GNU GPL v2 with additional terms. For full terms see the file doc/LICENSE.txt
  */
 
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:open_nizvpn/core/models/dnsConfig.dart';
@@ -11,6 +12,13 @@ import '../models/vpnConfig.dart';
 import 'package:package_info/package_info.dart';
 
 class AliVpn {
+  
+  static final _statusController = StreamController<String>.broadcast();
+  //   static Stream<VpnStatus?> vpnStatusSnapshot() {
+  //   return _statusController.stream.map((event) => 
+  //     VpnStatus(byteIn: event, byteOut: event)
+  //   );
+  // }
   ///Channel to native
   static final String _eventChannelVpnStage = "id.nizwar.nvpn/vpnstage";
   static final String _eventChannelVpnStatus = "id.nizwar.nvpn/vpnstatus";

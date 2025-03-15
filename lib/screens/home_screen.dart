@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:open_nizvpn/controllers/location_controller.dart';
+import 'package:open_nizvpn/core/utils/nizvpn_engine.dart';
 
 import '../controllers/home_controller.dart';
 import '../helpers/pref.dart';
 import '../main.dart';
 
 import '../models/vpn_status.dart';
-import '../services/vpn_engine.dart';
 import '../widgets/count_down_timer.dart';
 import '../widgets/home_card.dart';
 import 'location_screen.dart';
@@ -17,17 +17,16 @@ import 'network_test_screen.dart';
 import '../models/vpn.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen();
+  final HomeController _controller = Get.put(HomeController());
+  final LocationController _locationController = Get.put(LocationController());
 
-  HomeController _controller = Get.put(HomeController());
-  LocationController _locationController = Get.put(LocationController());
+  HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // _controller = Get.put(HomeController());
     // _locationController = Get.put(LocationController());
     _controller.initVpn();
-    VpnEngine.vpnStageSnapshot().listen((event) {
+    AliVpn.vpnStageSnapshot().listen((event) {
       _controller.vpnState.value = event;
     });
 
@@ -107,7 +106,8 @@ class HomeScreen extends StatelessWidget {
 
               StreamBuilder<VpnStatus?>(
                   initialData: VpnStatus(),
-                  stream: VpnEngine.vpnStatusSnapshot(),
+                  stream: AliVpn.vpnStatusSnapshot()
+                      .map((event) => event != null ? VpnStatus.fromJson(event as Map<String, dynamic>) : null),
                   builder: (context, snapshot) => Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -196,7 +196,7 @@ class HomeScreen extends StatelessWidget {
             padding: EdgeInsets.symmetric(vertical: 6, horizontal: 16),
             decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(15)),
             child: Text(
-              _controller.vpnState.value == VpnEngine.vpnDisconnected
+              _controller.vpnState.value == AliVpn.vpnDisconnected
                   ? 'Not Connected'
                   : _controller.vpnState.replaceAll('_', ' ').toUpperCase(),
               style: TextStyle(fontSize: 12.5, color: Colors.white),
@@ -204,7 +204,7 @@ class HomeScreen extends StatelessWidget {
           ),
 
           //count down timer
-          Obx(() => CountDownTimer(startTimer: _controller.vpnState.value == VpnEngine.vpnConnected)),
+          Obx(() => CountDownTimer(startTimer: _controller.vpnState.value == AliVpn.vpnConnected)),
         ],
       );
 

@@ -32,11 +32,13 @@ class HomeController extends GetxController {
   }
 
   void connectToVpn() async {
+    print('Start connectToVpn');
     if (vpn.value.vpnConfigPath.isEmpty) {
       print('No VPN Selected');
       Get.snackbar('Selection Required', 'Please select a VPN server first');
       return;
     }
+    print('VPN Selected ${vpn.value.vpnConfigPath}');
     try {
       if (_selectedVpn == null) return;
 
@@ -95,17 +97,30 @@ class HomeController extends GetxController {
 
   VpnConfig? _selectedVpn;
   List<VpnConfig> _listVpn = [];
-  void connectClick() {
+  Future<void> connectClick() async {
     ///Stop right here if user not select a vpn
-    if (_selectedVpn == null) return;
+    if (_selectedVpn == null) {
+      print('No VPN Selected');
+      Get.snackbar('Selection Required', 'Please select a VPN server first');
+      return;
+    } else {
+      _selectedVpn =
+          VpnConfig(config: await rootBundle.loadString(vpn.value.vpnConfigPath), name: vpn.value.countryLong);
+      print('VPN Selected ${_selectedVpn!.name}');
+    }
+    ;
 
     if (vpnState.value == VpnEngine.vpnDisconnected) {
+      print('Start VPN and stage is ${vpnState.value}');
+
       ///Start if stage is disconnected
       AliVpn.startVpn(
         _selectedVpn!,
         dns: DnsConfig("23.253.163.53", "198.101.242.72"),
       );
     } else {
+      print('Stop VPN and stage is ${vpnState.value}');
+
       ///Stop if stage is "not" disconnected
       AliVpn.stopVpn();
     }

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:open_nizvpn/core/utils/nizvpn_engine.dart';
 import 'package:open_nizvpn/helpers/my_dialogs.dart';
 
 import '../controllers/home_controller.dart';
@@ -32,8 +33,8 @@ class VpnCard extends StatelessWidget {
 
             MyDialogs.info(msg: 'Connecting VPN Location...');
 
-            if (controller.vpnState.value == VpnEngine.vpnConnected) {
-              VpnEngine.stopVpn();
+            if (controller.vpnState.value == AliVpn.vpnConnected) {
+              AliVpn.stopVpn();
               Future.delayed(Duration(seconds: 2), () => controller.connectToVpn());
             } else {
               controller.connectToVpn();
