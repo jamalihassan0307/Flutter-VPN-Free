@@ -30,7 +30,7 @@ class VpnCard extends StatelessWidget {
             Pref.vpn = vpn;
             Get.back();
 
-            MyDialogs.success(msg: 'Connecting VPN Location...');
+            MyDialogs.info(msg: 'Connecting VPN Location...');
 
             if (controller.vpnState.value == VpnEngine.vpnConnected) {
               VpnEngine.stopVpn();
