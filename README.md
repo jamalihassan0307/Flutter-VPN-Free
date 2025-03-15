@@ -176,3 +176,71 @@ You can download the latest version of the app from:
 Developed by [Jam Ali Hassan](https://github.com/jamalihassan0307)
 
 ---
+
+## Do this to Connect / Disconnect
+
+Connect or Disconnect vpn with single line of code!
+
+```dart
+    ...
+        _vpnStage = AliVpn.vpnDisconnected;
+        _selectedVpn = VpnConfig(
+            config: "OVPN CONFIG IS HERE",
+            name: "Japan",
+            username: "VPN Username",
+            password:"VPN Password"
+        );
+    ...
+
+    ...
+        if (_selectedVpn == null) return; //Stop right here if user not select a vpn
+        if (_vpnStage == AliVpn.vpnDisconnected) {
+            //Start if stage is disconnected
+            AliVpn.startVpn(_selectedVpn);
+        } else {
+            //Stop if stage is "not" disconnected
+            AliVpn.stopVpn();
+        }
+    ...
+```
+
+## Listen to VPN Stage & Status
+
+Don't forget to listen your vpn stage and status, you can simply show them with this.
+
+```dart
+    ...
+        //Add listener to update vpnStage
+        AliVpn.vpnStageSnapshot().listen((event) {
+            setState(() {
+                _vpnStage = event; //Look at stages detail below
+            });
+        });
+    ...
+    ...
+        //Add listener to update vpnStatus
+        AliVpn.vpnStatusSnapshot().listen((event){
+            setState((){
+                _vpnStatus = event;
+            });
+        })
+    ...
+```
+
+### VPN Stages
+
+Let me be clearer, VPN Stage shows the connection indicator when connecting the VPN
+
+```dart
+static const String vpnConnected = "connected";
+static const String vpnDisconnected = "disconnected";
+static const String vpnWaitConnection = "wait_connection";
+static const String vpnAuthenticating = "authenticating";
+static const String vpnReconnect = "reconnect";
+static const String vpnNoConnection = "no_connection";
+static const String vpnConnecting = "connecting";
+static const String vpnPrepare = "prepare";
+static const String vpnDenied = "denied";
+```
+
+Note : To change notification's icon, you can go to `vpnLib/main/res/drawable` and replace ic_notification.png from there!
