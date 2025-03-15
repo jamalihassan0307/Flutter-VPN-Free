@@ -19,36 +19,36 @@ class HomeController extends GetxController {
     speed: '',
     countryLong: '',
     countryShort: '',
-    numVpnSessions: 0,
-    config: '',
+    imagePath: '',
+    vpnConfigPath: '',
   ).obs;
   final vpnState = VpnEngine.vpnDisconnected.obs;
 
   void selectFirstVpn(List<Vpn> vpnList) {
-    if (vpnList.isNotEmpty && vpn.value.config.isEmpty) {
-      vpn.value = vpnList[0];
-      print('Auto-selected first VPN: ${vpn.value.hostname}');
-    }
+    // if (vpnList.isNotEmpty && vpn.value.config.isEmpty) {
+    //   vpn.value = vpnList[0];
+    //   print('Auto-selected first VPN: ${vpn.value.hostname}');
+    // }
   }
 
   void connectToVpn() async {
-    if (vpn.value.config.isEmpty) {
-      print('No VPN Selected');
-      Get.snackbar('Selection Required', 'Please select a VPN server first');
-      return;
-    }
+    // if (vpn.value.config.isEmpty) {
+    //   print('No VPN Selected');
+    //   Get.snackbar('Selection Required', 'Please select a VPN server first');
+    //   return;
+    // }
 
-    if (vpnState.value == VpnEngine.vpnDisconnected) {
-      try {
-        await VpnService.startVpn(vpn.value.config);
-        Get.snackbar('Connection Successful', 'Connected to ${vpn.value.countryLong}',
-            backgroundColor: Colors.green, colorText: Colors.white);
-      } catch (e) {
-        Get.snackbar('Connection Failed', 'Error: ${e.toString()}');
-      }
-    } else {
-      await VpnService.stopVpn();
-    }
+    // if (vpnState.value == VpnEngine.vpnDisconnected) {
+    //   try {
+    //     await VpnService.startVpn(vpn.value.config);
+    //     Get.snackbar('Connection Successful', 'Connected to ${vpn.value.countryLong}',
+    //         backgroundColor: Colors.green, colorText: Colors.white);
+    //   } catch (e) {
+    //     Get.snackbar('Connection Failed', 'Error: ${e.toString()}');
+    //   }
+    // } else {
+    //   await VpnService.stopVpn();
+    // }
   }
 
   // vpn buttons color

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:open_nizvpn/controllers/location_controller.dart';
 
 import '../controllers/home_controller.dart';
 import '../helpers/pref.dart';
@@ -19,6 +20,7 @@ class HomeScreen extends StatelessWidget {
   HomeScreen();
 
   final _controller = Get.put(HomeController());
+  final _locationController = Get.put(LocationController());
 
   @override
   Widget build(BuildContext context) {
@@ -136,44 +138,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   Future<List<Vpn>> _loadVpnList() async {
-    return [
-      Vpn(
-        hostname: 'us-free-1.vpn.com',
-        ip: '192.168.1.1',
-        ping: '20',
-        speed: '1000',
-        countryLong: 'United States',
-        countryShort: 'US',
-        numVpnSessions: 1,
-        config: '''client
-        dev tun
-        proto udp
-        remote us-free-1.vpn.com 1194
-        cipher AES-256-CBC
-        auth SHA256
-        persist-tun
-        nobind
-        verb 3''',
-      ),
-      Vpn(
-        hostname: 'jp-free-1.vpn.com',
-        ip: '192.168.1.2',
-        ping: '50',
-        speed: '500',
-        countryLong: 'Japan',
-        countryShort: 'JP',
-        numVpnSessions: 1,
-        config: '''client
-        dev tun
-        proto udp
-        remote jp-free-1.vpn.com 1194
-        cipher AES-256-CBC
-        auth SHA256
-        persist-tun
-        nobind
-        verb 3''',
-      ),
-    ];
+    return _locationController.vpnList;
   }
 
   //vpn button

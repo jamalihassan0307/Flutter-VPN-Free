@@ -18,7 +18,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  String _vpnState = NizVpn.vpnDisconnected;
+  String _vpnState = AliVpn.vpnDisconnected;
   List<VpnConfig> _listVpn = [];
   VpnConfig? _selectedVpn;
 
@@ -27,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
 
     ///Add listener to update vpnstate
-    NizVpn.vpnStageSnapshot().listen((event) {
+    AliVpn.vpnStageSnapshot().listen((event) {
       setState(() {
         _vpnState = event;
       });
@@ -68,7 +68,7 @@ class _MainScreenState extends State<MainScreen> {
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
                   child: Text(
-                    _vpnState == NizVpn.vpnDisconnected ? "Connect VPN!" : _vpnState.replaceAll("_", " ").toUpperCase(),
+                    _vpnState == AliVpn.vpnDisconnected ? "Connect VPN!" : _vpnState.replaceAll("_", " ").toUpperCase(),
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: _connectClick,
@@ -76,7 +76,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
               StreamBuilder<VpnStatus?>(
                 initialData: VpnStatus(),
-                stream: NizVpn.vpnStatusSnapshot(),
+                stream: AliVpn.vpnStatusSnapshot(),
                 builder: (context, snapshot) => Text("${snapshot.data?.byteIn ?? ""}, ${snapshot.data?.byteOut ?? ""}",
                     textAlign: TextAlign.center),
               )
@@ -98,7 +98,7 @@ class _MainScreenState extends State<MainScreen> {
                           onTap: () {
                             if (_selectedVpn == e) return;
                             log("${e.name} is selected");
-                            NizVpn.stopVpn();
+                            AliVpn.stopVpn();
                             setState(() {
                               _selectedVpn = e;
                             });
@@ -117,15 +117,15 @@ class _MainScreenState extends State<MainScreen> {
     ///Stop right here if user not select a vpn
     if (_selectedVpn == null) return;
 
-    if (_vpnState == NizVpn.vpnDisconnected) {
+    if (_vpnState == AliVpn.vpnDisconnected) {
       ///Start if stage is disconnected
-      NizVpn.startVpn(
+      AliVpn.startVpn(
         _selectedVpn!,
         dns: DnsConfig("23.253.163.53", "198.101.242.72"),
       );
     } else {
       ///Stop if stage is "not" disconnected
-      NizVpn.stopVpn();
+      AliVpn.stopVpn();
     }
   }
 }

@@ -10,7 +10,7 @@ import '../models/vpnStatus.dart';
 import '../models/vpnConfig.dart';
 import 'package:package_info/package_info.dart';
 
-class NizVpn {
+class AliVpn {
   ///Channel to native
   static final String _eventChannelVpnStage = "id.nizwar.nvpn/vpnstage";
   static final String _eventChannelVpnStatus = "id.nizwar.nvpn/vpnstatus";
@@ -20,7 +20,10 @@ class NizVpn {
   static Stream<String> vpnStageSnapshot() => EventChannel(_eventChannelVpnStage).receiveBroadcastStream().cast();
 
   ///Snapshot of VPN Connection Status
-  static Stream<VpnStatus?> vpnStatusSnapshot() => EventChannel(_eventChannelVpnStatus).receiveBroadcastStream().map((event) => VpnStatus.fromJson(jsonDecode(event))).cast();
+  static Stream<VpnStatus?> vpnStatusSnapshot() => EventChannel(_eventChannelVpnStatus)
+      .receiveBroadcastStream()
+      .map((event) => VpnStatus.fromJson(jsonDecode(event)))
+      .cast();
 
   ///Start VPN easily
   static Future<void> startVpn(VpnConfig vpnConfig, {DnsConfig? dns, List<String>? bypassPackages}) async {

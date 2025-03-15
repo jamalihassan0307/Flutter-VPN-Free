@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:open_nizvpn/helpers/my_dialogs.dart';
 
 import '../controllers/home_controller.dart';
 import '../helpers/pref.dart';
@@ -29,7 +30,7 @@ class VpnCard extends StatelessWidget {
             Pref.vpn = vpn;
             Get.back();
 
-            // MyDialogs.success(msg: 'Connecting VPN Location...');
+            MyDialogs.success(msg: 'Connecting VPN Location...');
 
             if (controller.vpnState.value == VpnEngine.vpnConnected) {
               VpnEngine.stopVpn();
@@ -49,8 +50,7 @@ class VpnCard extends StatelessWidget {
                   BoxDecoration(border: Border.all(color: Colors.black12), borderRadius: BorderRadius.circular(5)),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(5),
-                child: Image.asset('assets/flags/${vpn.countryShort.toLowerCase()}.png',
-                    height: 40, width: mq.width * .15, fit: BoxFit.cover),
+                child: Image.asset(vpn.imagePath, height: 40, width: mq.width * .15, fit: BoxFit.cover),
               ),
             ),
 
@@ -70,7 +70,7 @@ class VpnCard extends StatelessWidget {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(vpn.numVpnSessions.toString(),
+                Text(vpn.countryLong.toString(),
                     style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Theme.of(context).lightText)),
                 SizedBox(width: 4),
                 Icon(CupertinoIcons.person_3, color: Colors.blue),
