@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <application
         android:name="${applicationName}"
-        android:label="Open NIZVPN"
+        android:label="FastVPN"
         android:icon="@mipmap/launcher_icon"
         tools:ignore="AllowBackup">
         <activity
