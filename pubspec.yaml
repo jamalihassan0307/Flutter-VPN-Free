@@ -19,6 +19,7 @@ dependencies:
   # firebase_core: ^2.24.2
   # firebase_remote_config: ^4.3.8
   flutter_launcher_icons:
+  change_app_package_name: ^1.5.0
 
 flutter_launcher_icons:
   android: "launcher_icon"
