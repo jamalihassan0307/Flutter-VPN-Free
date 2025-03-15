@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/route_manager.dart';
-import 'package:open_nizvpn/controllers/home_controller.dart';
-import 'package:open_nizvpn/controllers/location_controller.dart';
+import 'package:FastVPN/controllers/home_controller.dart';
+import 'package:FastVPN/controllers/location_controller.dart';
 
 // import '../helpers/ad_helper.dart';
 import '../main.dart';

@@ -6,7 +6,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:open_nizvpn/core/models/dnsConfig.dart';
+import 'package:FastVPN/core/models/dnsConfig.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../models/vpnStatus.dart';
 import '../models/vpnConfig.dart';

@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:open_nizvpn/core/utils/nizvpn_engine.dart';
-import 'package:open_nizvpn/helpers/my_dialogs.dart';
+import 'package:FastVPN/core/utils/nizvpn_engine.dart';
+import 'package:FastVPN/helpers/my_dialogs.dart';
 
 import '../controllers/home_controller.dart';
 import '../helpers/pref.dart';

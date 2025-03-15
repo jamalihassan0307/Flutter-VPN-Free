@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:open_nizvpn/controllers/location_controller.dart';
-import 'package:open_nizvpn/core/models/dnsConfig.dart';
-import 'package:open_nizvpn/core/models/vpnConfig.dart';
-import 'package:open_nizvpn/core/utils/nizvpn_engine.dart';
+import 'package:FastVPN/controllers/location_controller.dart';
+import 'package:FastVPN/core/models/dnsConfig.dart';
+import 'package:FastVPN/core/models/vpnConfig.dart';
+import 'package:FastVPN/core/utils/nizvpn_engine.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/vpn.dart';
@@ -41,8 +41,6 @@ class HomeController extends GetxController {
       print('VPN Status Update: $event');
 
       switch (event.toUpperCase()) {
-       
-
         case "DISCONNECTED":
           vpnState.value = 'disconnected';
           isConnected.value = false;
@@ -50,7 +48,7 @@ class HomeController extends GetxController {
           Get.snackbar('Disconnected', 'VPN connection terminated',
               backgroundColor: Colors.red, colorText: Colors.white);
           break;
- case "CONNECTED":
+        case "CONNECTED":
           vpnState.value = 'connected';
           isConnected.value = true;
           connectionStatus.value = 'VPN Connected Successfully';

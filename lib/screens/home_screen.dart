@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:open_nizvpn/controllers/location_controller.dart';
-import 'package:open_nizvpn/core/utils/nizvpn_engine.dart';
+import 'package:FastVPN/controllers/location_controller.dart';
+import 'package:FastVPN/core/utils/nizvpn_engine.dart';
 
 import '../controllers/home_controller.dart';
 import '../helpers/pref.dart';
