@@ -145,7 +145,7 @@ class VpnCard extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Icon(
-            CupertinoIcons.wifi,
+            Icons.wifi,
             color: Theme.of(context).primaryColor,
             size: 20,
           ),
@@ -172,7 +172,7 @@ class VpnCard extends StatelessWidget {
     Pref.vpn = vpn;
     Get.back();
     MyDialogs.info(msg: 'Connecting VPN Location...');
-    
+
     if (controller.vpnState.value == AliVpn.vpnConnected) {
       AliVpn.stopVpn();
       Future.delayed(Duration(seconds: 2), () {

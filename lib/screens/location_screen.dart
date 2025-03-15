@@ -101,7 +101,7 @@ class LocationScreen extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.all(16),
             child: Icon(
-              CupertinoIcons.refresh,
+              Icons.refresh,
               color: Colors.white,
               size: 28,
             ),
